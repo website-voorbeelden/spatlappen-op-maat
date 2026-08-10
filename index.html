@@ -647,6 +647,16 @@
               <label for="website">Website</label>
               <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
             </div>
+            <input type="hidden" name="form_started_at" id="form-started-at">
+            <input type="hidden" name="page" id="form-page">
+            <input type="hidden" name="utm_source">
+            <input type="hidden" name="utm_medium">
+            <input type="hidden" name="utm_campaign">
+            <input type="hidden" name="utm_term">
+            <input type="hidden" name="utm_content">
+            <input type="hidden" name="gclid">
+            <input type="hidden" name="gbraid">
+            <input type="hidden" name="wbraid">
 
             <div class="field">
               <label for="name">Naam</label>
@@ -662,7 +672,7 @@
             </div>
             <div class="field file-field">
               <label for="attachment">Foto, logo, schets of PDF uploaden</label>
-              <input type="file" id="attachment" name="attachment" accept="image/*,.pdf,.svg">
+              <input type="file" id="attachment" name="attachment" accept=".jpg,.jpeg,.png,.webp,.heic,.pdf,.svg">
               <small>Maximaal 4 MB.</small>
             </div>
 
@@ -719,6 +729,24 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    document.getElementById('form-started-at').value = Date.now();
+    document.getElementById('form-page').value = window.location.href;
+
+    const campaignFields = [
+      'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+      'gclid', 'gbraid', 'wbraid'
+    ];
+    const searchParams = new URLSearchParams(window.location.search);
+
+    campaignFields.forEach((fieldName) => {
+      const storageKey = `spatlappen_${fieldName}`;
+      const queryValue = searchParams.get(fieldName);
+      if (queryValue) sessionStorage.setItem(storageKey, queryValue);
+
+      const field = form.elements[fieldName];
+      if (field) field.value = queryValue || sessionStorage.getItem(storageKey) || '';
+    });
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       statusEl.className = 'form-status';
@@ -750,6 +778,12 @@
         if (!response.ok) throw new Error(result.error || 'De aanvraag kon niet worden verzonden.');
 
         form.reset();
+        document.getElementById('form-started-at').value = Date.now();
+        document.getElementById('form-page').value = window.location.href;
+        campaignFields.forEach((fieldName) => {
+          const field = form.elements[fieldName];
+          if (field) field.value = sessionStorage.getItem(`spatlappen_${fieldName}`) || '';
+        });
         statusEl.classList.add('success');
         statusEl.textContent = 'Bedankt. Je aanvraag is verzonden.';
       } catch (error) {
