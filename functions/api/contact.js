@@ -96,6 +96,7 @@ export async function onRequestPost({ request, env }) {
   const data = {
     name: clean(form.get('name'), 100),
     email: clean(form.get('email'), 160).toLowerCase(),
+    phone: clean(form.get('phone'), 50),
     message: clean(form.get('message'), 4000),
     page: clean(form.get('page'), 300),
     utmSource: clean(form.get('utm_source'), 150),
@@ -165,6 +166,7 @@ export async function onRequestPost({ request, env }) {
         <table style="width:100%;border-collapse:collapse">
           <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Naam</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.name)}</td></tr>
           <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">E-mail</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.email)}</td></tr>
+          <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Telefoon</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.phone || 'Niet opgegeven')}</td></tr>
           <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Pagina</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.page || 'Onbekend')}</td></tr>
         </table>
         <h2 style="font-size:17px;color:#17191b;margin:26px 0 8px">Toelichting</h2>
@@ -178,6 +180,7 @@ export async function onRequestPost({ request, env }) {
     'Nieuwe aanvraag via Spatlappenopmaat.nl',
     `Naam: ${data.name}`,
     `E-mail: ${data.email}`,
+    `Telefoon: ${data.phone || 'Niet opgegeven'}`,
     `Pagina: ${data.page || 'Onbekend'}`,
     '',
     'Toelichting:',
