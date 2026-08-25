@@ -385,6 +385,7 @@ button.button {
 .hero-visual {
   position: relative;
   width: min(100%, 500px);
+  aspect-ratio: 1;
   margin: 0;
   justify-self: end;
 }
@@ -401,8 +402,9 @@ button.button {
 .hero-visual img {
   position: relative;
   z-index: 1;
+  display: block;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   border-radius: 22px;
   box-shadow: var(--shadow);
   object-fit: cover;
@@ -636,6 +638,7 @@ section {
 .section-image {
   position: relative;
   width: min(100%, 500px);
+  aspect-ratio: 1;
   margin: 0;
 }
 
@@ -651,8 +654,9 @@ section {
 .section-image img {
   position: relative;
   z-index: 1;
+  display: block;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   border-radius: 22px;
   box-shadow: var(--shadow);
   object-fit: cover;
@@ -909,6 +913,10 @@ details p {
 
 .form-grid .field {
   margin-top: 0;
+}
+
+.form-grid .field-full {
+  grid-column: 1 / -1;
 }
 
 .field label {
