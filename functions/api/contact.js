@@ -98,15 +98,21 @@ export async function onRequestPost({ request, env }) {
     email: clean(form.get('email'), 160).toLowerCase(),
     phone: clean(form.get('phone'), 50),
     message: clean(form.get('message'), 4000),
-    page: clean(form.get('page'), 300),
+    page: clean(form.get('page'), 500),
+    landingPage: clean(form.get('landing_page'), 500),
+    referrerDomain: clean(form.get('referrer_domain'), 250),
+    sourceDetected: clean(form.get('source_detected'), 150),
     utmSource: clean(form.get('utm_source'), 150),
     utmMedium: clean(form.get('utm_medium'), 150),
     utmCampaign: clean(form.get('utm_campaign'), 200),
+    utmId: clean(form.get('utm_id'), 200),
     utmTerm: clean(form.get('utm_term'), 200),
     utmContent: clean(form.get('utm_content'), 200),
     gclid: clean(form.get('gclid'), 300),
     gbraid: clean(form.get('gbraid'), 300),
-    wbraid: clean(form.get('wbraid'), 300)
+    wbraid: clean(form.get('wbraid'), 300),
+    msclkid: clean(form.get('msclkid'), 300),
+    fbclid: clean(form.get('fbclid'), 300)
   };
 
   if (!data.name || !data.email || !data.message) {
@@ -138,18 +144,24 @@ export async function onRequestPost({ request, env }) {
   }
 
   const campaignRows = [
+    ['Vastgestelde bron', data.sourceDetected],
+    ['Landingspagina', data.landingPage],
+    ['Verwijzend domein', data.referrerDomain],
     ['UTM-bron', data.utmSource],
     ['UTM-medium', data.utmMedium],
     ['UTM-campagne', data.utmCampaign],
+    ['UTM-ID', data.utmId],
     ['UTM-term', data.utmTerm],
     ['UTM-content', data.utmContent],
     ['GCLID', data.gclid],
     ['GBRAID', data.gbraid],
-    ['WBRAID', data.wbraid]
+    ['WBRAID', data.wbraid],
+    ['MSCLKID', data.msclkid],
+    ['FBCLID', data.fbclid]
   ].filter(([, value]) => value);
 
   const campaignHtml = campaignRows.length ? `
-    <h2 style="font-size:17px;color:#17191b;margin:26px 0 8px">Campagnegegevens</h2>
+    <h2 style="font-size:17px;color:#17191b;margin:26px 0 8px">Herkomstgegevens</h2>
     <table style="width:100%;border-collapse:collapse">${campaignRows.map(([label, value]) => `
       <tr>
         <th style="padding:7px 12px;text-align:left;border-bottom:1px solid #e3e0d9;color:#17191b">${escapeHtml(label)}</th>
