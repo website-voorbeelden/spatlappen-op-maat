@@ -66,11 +66,14 @@ const campaignFields = [
   'utm_source',
   'utm_medium',
   'utm_campaign',
+  'utm_id',
   'utm_term',
   'utm_content',
   'gclid',
   'gbraid',
   'wbraid',
+  'msclkid',
+  'fbclid',
 ];
 
 const searchParameters = new URLSearchParams(window.location.search);
@@ -91,15 +94,87 @@ const saveSessionValue = (key, value) => {
   }
 };
 
+const getExternalReferrerDomain = () => {
+  if (!document.referrer) return '';
+
+  try {
+    const referrerDomain = new URL(document.referrer).hostname
+      .replace(/^www\./, '')
+      .toLowerCase();
+    const currentDomain = window.location.hostname
+      .replace(/^www\./, '')
+      .toLowerCase();
+
+    return referrerDomain && referrerDomain !== currentDomain ? referrerDomain : '';
+  } catch {
+    return '';
+  }
+};
+
+const detectSource = (values, referrerDomain) => {
+  const utmSource = values.utm_source.toLowerCase();
+  const utmMedium = values.utm_medium.toLowerCase();
+  const sourceAndReferrer = `${utmSource} ${referrerDomain}`;
+
+  if (/chatgpt|openai/.test(sourceAndReferrer)) return 'ChatGPT';
+  if (values.gclid || values.gbraid || values.wbraid) return 'Google Ads';
+  if (values.msclkid) return 'Microsoft Ads';
+  if (values.fbclid) return 'Meta Ads';
+
+  if (utmSource) {
+    if (/google/.test(utmSource)) {
+      return /cpc|ppc|paid/.test(utmMedium) ? 'Google Ads' : 'Google';
+    }
+    if (/bing|microsoft/.test(utmSource)) {
+      return /cpc|ppc|paid/.test(utmMedium) ? 'Microsoft Ads' : 'Bing';
+    }
+    if (/facebook|instagram|meta/.test(utmSource)) return 'Meta';
+    if (/bouwmarktxl/.test(utmSource)) return 'BouwmarktXL';
+    return `UTM: ${values.utm_source}`;
+  }
+
+  if (/google\./.test(referrerDomain)) return 'Google organisch';
+  if (/bing\./.test(referrerDomain)) return 'Bing organisch';
+  if (/bouwmarktxl/.test(referrerDomain)) return 'BouwmarktXL';
+  if (referrerDomain) return referrerDomain;
+
+  return 'Direct';
+};
+
+const setHiddenField = (fieldName, value) => {
+  const field = form.elements[fieldName];
+  if (field) field.value = value;
+};
+
 const populateCampaignFields = () => {
+  const campaignValues = {};
+
   campaignFields.forEach((fieldName) => {
     const storageKey = `spatlappen_${fieldName}`;
     const queryValue = searchParameters.get(fieldName);
     if (queryValue) saveSessionValue(storageKey, queryValue);
 
-    const field = form.elements[fieldName];
-    if (field) field.value = queryValue || readSessionValue(storageKey);
+    const value = queryValue || readSessionValue(storageKey);
+    campaignValues[fieldName] = value;
+    setHiddenField(fieldName, value);
   });
+
+  const landingPageKey = 'spatlappen_landing_page';
+  if (!readSessionValue(landingPageKey)) {
+    saveSessionValue(landingPageKey, window.location.href);
+  }
+
+  const referrerKey = 'spatlappen_referrer_domain';
+  const externalReferrerDomain = getExternalReferrerDomain();
+  if (externalReferrerDomain && !readSessionValue(referrerKey)) {
+    saveSessionValue(referrerKey, externalReferrerDomain);
+  }
+
+  const landingPage = readSessionValue(landingPageKey) || window.location.href;
+  const referrerDomain = readSessionValue(referrerKey);
+  setHiddenField('landing_page', landingPage);
+  setHiddenField('referrer_domain', referrerDomain);
+  setHiddenField('source_detected', detectSource(campaignValues, referrerDomain));
 };
 
 populateCampaignFields();
