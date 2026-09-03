@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://spatlappenopmaat.nl/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-09-03</lastmod>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlap-met-logo-hero.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlap-bedrukt.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlap-xl-wit.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlap-waarschuwingsbord-schaduw.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlappen-op-maat.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://spatlappenopmaat.nl/spatlappen-met-bedrukking.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://spatlappenopmaat.nl/bedrijfsgegevens.html</loc>
+    <lastmod>2026-09-03</lastmod>
   </url>
 </urlset>
