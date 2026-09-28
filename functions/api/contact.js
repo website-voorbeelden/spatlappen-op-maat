@@ -57,7 +57,10 @@ const sendWithResend = async (apiKey, payload) => {
 };
 
 export async function onRequestPost({ request, env }) {
-  if (!env.RESEND_API_KEY || !env.FROM_EMAIL || !env.TO_EMAIL) {
+  const fromEmail = 'Spatlappen op Maat <noreply@spatlappenopmaat.nl>';
+  const toEmail = 'spatlappenopmaat@gmail.com';
+
+  if (!env.RESEND_API_KEY) {
     console.error('Missing Resend environment variables');
     return json({
       ok: false,
@@ -204,8 +207,8 @@ export async function onRequestPost({ request, env }) {
 
   try {
     await sendWithResend(env.RESEND_API_KEY, {
-      from: env.FROM_EMAIL,
-      to: [env.TO_EMAIL],
+      from: fromEmail,
+      to: [toEmail],
       reply_to: data.email,
       subject: `Nieuwe aanvraag spatlappen – ${data.name}`,
       html,
