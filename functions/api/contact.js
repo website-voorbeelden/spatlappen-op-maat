@@ -45,10 +45,6 @@ const toBase64 = async (file) => bytesToBase64(
   new Uint8Array(await file.arrayBuffer())
 );
 
-const textToBase64 = (value) => bytesToBase64(
-  new TextEncoder().encode(value)
-);
-
 const sendWithResend = async (apiKey, payload) => {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -164,62 +160,6 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  const leadHeaders = Object.fromEntries([
-    ['X-Lead-First-Source', data.firstSource],
-    ['X-Lead-Last-Source', data.lastSource || data.sourceDetected],
-    ['X-Lead-First-Referrer', data.firstReferrer],
-    ['X-Lead-Last-Referrer', data.lastReferrer || data.referrerDomain],
-    ['X-Lead-First-Seen', data.firstSeen],
-    ['X-Lead-Session-Count', data.sessionCount],
-    ['X-Lead-UTM-Source', data.utmSource],
-    ['X-Lead-UTM-Medium', data.utmMedium],
-    ['X-Lead-UTM-Campaign', data.utmCampaign],
-    ['X-Lead-UTM-ID', data.utmId],
-    ['X-Lead-UTM-Term', data.utmTerm],
-    ['X-Lead-UTM-Content', data.utmContent],
-    ['X-Lead-GCLID', data.gclid],
-    ['X-Lead-GBRAID', data.gbraid],
-    ['X-Lead-WBRAID', data.wbraid],
-    ['X-Lead-MSCLKID', data.msclkid],
-    ['X-Lead-FBCLID', data.fbclid]
-  ]
-    .filter(([, value]) => value)
-    .map(([key, value]) => [key, headerValue(value)]));
-
-  const attributionRows = [
-    ['Eerste bron', data.firstSource || data.sourceDetected || 'Onbekend'],
-    ['Laatste bron', data.lastSource || data.sourceDetected || 'Onbekend'],
-    ['Eerste verwijzer', data.firstReferrer || 'Niet beschikbaar'],
-    ['Laatste verwijzer', data.lastReferrer || data.referrerDomain || 'Niet beschikbaar'],
-    ['Eerste bezoek', data.firstSeen || new Date().toISOString()],
-    ['Aantal sessies', data.sessionCount || '1'],
-    ['UTM source', data.utmSource],
-    ['UTM medium', data.utmMedium],
-    ['UTM campaign', data.utmCampaign],
-    ['UTM id', data.utmId],
-    ['UTM term', data.utmTerm],
-    ['UTM content', data.utmContent],
-    ['Google click id (GCLID)', data.gclid],
-    ['Google GBRAID', data.gbraid],
-    ['Google WBRAID', data.wbraid],
-    ['Microsoft click id', data.msclkid],
-    ['Meta click id', data.fbclid]
-  ].filter(([, value]) => value);
-
-  const attributionText = [
-    'Aanvraaggegevens',
-    '=================',
-    '',
-    ...attributionRows.map(([label, value]) => `${label}: ${value}`),
-    '',
-    'Dit bestand is automatisch toegevoegd door het offerteformulier.'
-  ].join('\n');
-
-  attachments.push({
-    filename: 'aanvraaggegevens.txt',
-    content: textToBase64(attributionText)
-  });
-
   const html = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Tahoma,sans-serif;font-size:14px;color:#222;background:#fff">
       <tr>
@@ -247,7 +187,8 @@ export async function onRequestPost({ request, env }) {
                 </table>
 
                 <p style="margin:14px 0 0;font-size:11px;color:#777">
-                  Verzonden via het offerteformulier op Spatlappenopmaat.nl
+                  Verzonden via het offerteformulier op Spatlappenopmaat.nl<br>
+                  Herkomst: ${escapeHtml(data.sourceDetected || data.lastSource || 'Onbekend')}
                 </p>
               </td>
             </tr>
@@ -265,7 +206,9 @@ export async function onRequestPost({ request, env }) {
     `Bijlage: ${hasAttachment ? attachment.name : 'Geen'}`,
     '',
     'Bericht:',
-    data.message
+    data.message,
+    '',
+    `Herkomst: ${data.sourceDetected || data.lastSource || 'Onbekend'}`
   ].join('\\n');
 
   try {
@@ -276,7 +219,6 @@ export async function onRequestPost({ request, env }) {
       subject: `Nieuwe aanvraag spatlappen – ${data.name}`,
       html,
       text,
-      headers: leadHeaders,
       attachments
     });
 
