@@ -94,6 +94,22 @@ const saveSessionValue = (key, value) => {
   }
 };
 
+const readLocalValue = (key) => {
+  try {
+    return window.localStorage.getItem(key) || '';
+  } catch {
+    return '';
+  }
+};
+
+const saveLocalValue = (key, value) => {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Tracking is optioneel; het formulier blijft zonder localStorage werken.
+  }
+};
+
 const getExternalReferrerDomain = () => {
   if (!document.referrer) return '';
 
@@ -172,9 +188,44 @@ const populateCampaignFields = () => {
 
   const landingPage = readSessionValue(landingPageKey) || window.location.href;
   const referrerDomain = readSessionValue(referrerKey);
+  const currentSource = detectSource(campaignValues, referrerDomain);
+
+  const firstSeenKey = 'spatlappen_first_seen';
+  if (!readLocalValue(firstSeenKey)) {
+    saveLocalValue(firstSeenKey, new Date().toISOString());
+  }
+
+  const firstSourceKey = 'spatlappen_first_source';
+  if (!readLocalValue(firstSourceKey)) {
+    saveLocalValue(firstSourceKey, currentSource);
+  }
+
+  const firstReferrerKey = 'spatlappen_first_referrer';
+  if (!readLocalValue(firstReferrerKey) && referrerDomain) {
+    saveLocalValue(firstReferrerKey, referrerDomain);
+  }
+
+  const sessionCountKey = 'spatlappen_session_count';
+  const sessionCountedKey = 'spatlappen_session_counted';
+  let sessionCount = Number.parseInt(readLocalValue(sessionCountKey), 10) || 0;
+
+  if (!readSessionValue(sessionCountedKey)) {
+    sessionCount += 1;
+    saveLocalValue(sessionCountKey, String(sessionCount));
+    saveSessionValue(sessionCountedKey, '1');
+  }
+
+  if (!sessionCount) sessionCount = 1;
+
   setHiddenField('landing_page', landingPage);
   setHiddenField('referrer_domain', referrerDomain);
-  setHiddenField('source_detected', detectSource(campaignValues, referrerDomain));
+  setHiddenField('source_detected', currentSource);
+  setHiddenField('first_source', readLocalValue(firstSourceKey) || currentSource);
+  setHiddenField('last_source', currentSource);
+  setHiddenField('first_referrer', readLocalValue(firstReferrerKey));
+  setHiddenField('last_referrer', referrerDomain);
+  setHiddenField('first_seen', readLocalValue(firstSeenKey) || new Date().toISOString());
+  setHiddenField('session_count', String(sessionCount));
 };
 
 populateCampaignFields();
