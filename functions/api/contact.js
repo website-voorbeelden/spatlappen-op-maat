@@ -30,8 +30,7 @@ const headerValue = (value, maxLength = 500) => clean(value, maxLength)
   .normalize('NFKD')
   .replace(/[^\x20-\x7E]/g, '');
 
-const toBase64 = async (file) => {
-  const bytes = new Uint8Array(await file.arrayBuffer());
+const bytesToBase64 = (bytes) => {
   let binary = '';
   const chunkSize = 0x8000;
 
@@ -41,6 +40,14 @@ const toBase64 = async (file) => {
 
   return btoa(binary);
 };
+
+const toBase64 = async (file) => bytesToBase64(
+  new Uint8Array(await file.arrayBuffer())
+);
+
+const textToBase64 = (value) => bytesToBase64(
+  new TextEncoder().encode(value)
+);
 
 const sendWithResend = async (apiKey, payload) => {
   const response = await fetch('https://api.resend.com/emails', {
@@ -178,6 +185,40 @@ export async function onRequestPost({ request, env }) {
   ]
     .filter(([, value]) => value)
     .map(([key, value]) => [key, headerValue(value)]));
+
+  const attributionRows = [
+    ['Eerste bron', data.firstSource || data.sourceDetected || 'Onbekend'],
+    ['Laatste bron', data.lastSource || data.sourceDetected || 'Onbekend'],
+    ['Eerste verwijzer', data.firstReferrer || 'Niet beschikbaar'],
+    ['Laatste verwijzer', data.lastReferrer || data.referrerDomain || 'Niet beschikbaar'],
+    ['Eerste bezoek', data.firstSeen || new Date().toISOString()],
+    ['Aantal sessies', data.sessionCount || '1'],
+    ['UTM source', data.utmSource],
+    ['UTM medium', data.utmMedium],
+    ['UTM campaign', data.utmCampaign],
+    ['UTM id', data.utmId],
+    ['UTM term', data.utmTerm],
+    ['UTM content', data.utmContent],
+    ['Google click id (GCLID)', data.gclid],
+    ['Google GBRAID', data.gbraid],
+    ['Google WBRAID', data.wbraid],
+    ['Microsoft click id', data.msclkid],
+    ['Meta click id', data.fbclid]
+  ].filter(([, value]) => value);
+
+  const attributionText = [
+    'Aanvraaggegevens',
+    '=================',
+    '',
+    ...attributionRows.map(([label, value]) => `${label}: ${value}`),
+    '',
+    'Dit bestand is automatisch toegevoegd door het offerteformulier.'
+  ].join('\n');
+
+  attachments.push({
+    filename: 'aanvraaggegevens.txt',
+    content: textToBase64(attributionText)
+  });
 
   const html = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Tahoma,sans-serif;font-size:14px;color:#222;background:#fff">
