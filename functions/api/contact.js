@@ -25,6 +25,11 @@ const escapeHtml = (value) => clean(value)
 
 const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+const headerValue = (value, maxLength = 500) => clean(value, maxLength)
+  .replace(/[\r\n]+/g, ' ')
+  .normalize('NFKD')
+  .replace(/[^\x20-\x7E]/g, '');
+
 const toBase64 = async (file) => {
   const bytes = new Uint8Array(await file.arrayBuffer());
   let binary = '';
@@ -105,6 +110,12 @@ export async function onRequestPost({ request, env }) {
     landingPage: clean(form.get('landing_page'), 500),
     referrerDomain: clean(form.get('referrer_domain'), 250),
     sourceDetected: clean(form.get('source_detected'), 150),
+    firstSource: clean(form.get('first_source'), 150),
+    lastSource: clean(form.get('last_source'), 150),
+    firstReferrer: clean(form.get('first_referrer'), 250),
+    lastReferrer: clean(form.get('last_referrer'), 250),
+    firstSeen: clean(form.get('first_seen'), 100),
+    sessionCount: clean(form.get('session_count'), 20),
     utmSource: clean(form.get('utm_source'), 150),
     utmMedium: clean(form.get('utm_medium'), 150),
     utmCampaign: clean(form.get('utm_campaign'), 200),
@@ -146,64 +157,75 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  const campaignRows = [
-    ['Vastgestelde bron', data.sourceDetected],
-    ['Landingspagina', data.landingPage],
-    ['Verwijzend domein', data.referrerDomain],
-    ['UTM-bron', data.utmSource],
-    ['UTM-medium', data.utmMedium],
-    ['UTM-campagne', data.utmCampaign],
-    ['UTM-ID', data.utmId],
-    ['UTM-term', data.utmTerm],
-    ['UTM-content', data.utmContent],
-    ['GCLID', data.gclid],
-    ['GBRAID', data.gbraid],
-    ['WBRAID', data.wbraid],
-    ['MSCLKID', data.msclkid],
-    ['FBCLID', data.fbclid]
-  ].filter(([, value]) => value);
-
-  const campaignHtml = campaignRows.length ? `
-    <h2 style="font-size:17px;color:#17191b;margin:26px 0 8px">Herkomstgegevens</h2>
-    <table style="width:100%;border-collapse:collapse">${campaignRows.map(([label, value]) => `
-      <tr>
-        <th style="padding:7px 12px;text-align:left;border-bottom:1px solid #e3e0d9;color:#17191b">${escapeHtml(label)}</th>
-        <td style="padding:7px 12px;border-bottom:1px solid #e3e0d9;color:#555b60;word-break:break-all">${escapeHtml(value)}</td>
-      </tr>`).join('')}
-    </table>` : '';
+  const leadHeaders = Object.fromEntries([
+    ['X-Lead-First-Source', data.firstSource],
+    ['X-Lead-Last-Source', data.lastSource || data.sourceDetected],
+    ['X-Lead-First-Referrer', data.firstReferrer],
+    ['X-Lead-Last-Referrer', data.lastReferrer || data.referrerDomain],
+    ['X-Lead-First-Seen', data.firstSeen],
+    ['X-Lead-Session-Count', data.sessionCount],
+    ['X-Lead-UTM-Source', data.utmSource],
+    ['X-Lead-UTM-Medium', data.utmMedium],
+    ['X-Lead-UTM-Campaign', data.utmCampaign],
+    ['X-Lead-UTM-ID', data.utmId],
+    ['X-Lead-UTM-Term', data.utmTerm],
+    ['X-Lead-UTM-Content', data.utmContent],
+    ['X-Lead-GCLID', data.gclid],
+    ['X-Lead-GBRAID', data.gbraid],
+    ['X-Lead-WBRAID', data.wbraid],
+    ['X-Lead-MSCLKID', data.msclkid],
+    ['X-Lead-FBCLID', data.fbclid]
+  ]
+    .filter(([, value]) => value)
+    .map(([key, value]) => [key, headerValue(value)]));
 
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:720px;margin:auto;color:#17191b">
-      <div style="background:#17191b;padding:22px 24px;color:#fff">
-        <strong style="font-size:20px">Nieuwe aanvraag via Spatlappenopmaat.nl</strong>
-      </div>
-      <div style="padding:24px;border:1px solid #e3e0d9;border-top:0">
-        <table style="width:100%;border-collapse:collapse">
-          <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Naam</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.name)}</td></tr>
-          <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">E-mail</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.email)}</td></tr>
-          <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Telefoon</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.phone || 'Niet opgegeven')}</td></tr>
-          <tr><th style="padding:9px 12px;text-align:left;border-bottom:1px solid #e3e0d9">Pagina</th><td style="padding:9px 12px;border-bottom:1px solid #e3e0d9">${escapeHtml(data.page || 'Onbekend')}</td></tr>
-        </table>
-        <h2 style="font-size:17px;color:#17191b;margin:26px 0 8px">Toelichting</h2>
-        <div style="padding:16px;background:#f7f6f2;border-left:4px solid #f1612f;white-space:pre-wrap;color:#363b3f">${escapeHtml(data.message)}</div>
-        ${campaignHtml}
-        <p style="margin-top:24px;color:#666d72;font-size:13px">Bijlage: ${hasAttachment ? escapeHtml(attachment.name) : 'geen'}</p>
-      </div>
-    </div>`;
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Tahoma,sans-serif;font-size:14px;color:#222;background:#fff">
+      <tr>
+        <td>
+          <table width="680" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:680px;border:1px solid #b8b8b8">
+            <tr>
+              <td style="padding:10px 12px;background:#e7e7e7;border-bottom:1px solid #b8b8b8;font-weight:bold">
+                Nieuwe aanvraag via Spatlappenopmaat.nl
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px">
+                <table width="100%" cellpadding="5" cellspacing="0" border="0" style="border-collapse:collapse">
+                  <tr><td width="110" style="font-weight:bold;border-bottom:1px solid #ddd">Naam</td><td style="border-bottom:1px solid #ddd">${escapeHtml(data.name)}</td></tr>
+                  <tr><td style="font-weight:bold;border-bottom:1px solid #ddd">E-mail</td><td style="border-bottom:1px solid #ddd">${escapeHtml(data.email)}</td></tr>
+                  <tr><td style="font-weight:bold;border-bottom:1px solid #ddd">Telefoon</td><td style="border-bottom:1px solid #ddd">${escapeHtml(data.phone || 'Niet opgegeven')}</td></tr>
+                  <tr><td style="font-weight:bold;border-bottom:1px solid #ddd">Bijlage</td><td style="border-bottom:1px solid #ddd">${hasAttachment ? escapeHtml(attachment.name) : 'Geen'}</td></tr>
+                </table>
+
+                <p style="margin:18px 0 6px;font-weight:bold">Bericht</p>
+                <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse:collapse">
+                  <tr>
+                    <td style="border:1px solid #cfcfcf;background:#f5f5f5;white-space:pre-wrap;line-height:1.45">${escapeHtml(data.message)}</td>
+                  </tr>
+                </table>
+
+                <p style="margin:14px 0 0;font-size:11px;color:#777">
+                  Verzonden via het offerteformulier op Spatlappenopmaat.nl
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>`;
 
   const text = [
     'Nieuwe aanvraag via Spatlappenopmaat.nl',
+    '',
     `Naam: ${data.name}`,
     `E-mail: ${data.email}`,
     `Telefoon: ${data.phone || 'Niet opgegeven'}`,
-    `Pagina: ${data.page || 'Onbekend'}`,
+    `Bijlage: ${hasAttachment ? attachment.name : 'Geen'}`,
     '',
-    'Toelichting:',
-    data.message,
-    '',
-    `Bijlage: ${hasAttachment ? attachment.name : 'geen'}`,
-    ...campaignRows.map(([label, value]) => `${label}: ${value}`)
-  ].join('\n');
+    'Bericht:',
+    data.message
+  ].join('\\n');
 
   try {
     await sendWithResend(env.RESEND_API_KEY, {
@@ -213,6 +235,7 @@ export async function onRequestPost({ request, env }) {
       subject: `Nieuwe aanvraag spatlappen – ${data.name}`,
       html,
       text,
+      headers: leadHeaders,
       attachments
     });
 
