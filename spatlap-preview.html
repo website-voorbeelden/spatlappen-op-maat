@@ -4,16 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Spatlap Preview Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Oswald:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Russo+One&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --bg:#0f1115;--panel:#171a20;--panel2:#1e222a;--line:#2a303a;
   --text:#f3f5f7;--muted:#9aa4b2;--blue:#2f80ed;--input:#11151b;--danger:#df5252
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.app{display:grid;grid-template-columns:360px 1fr;min-height:100vh}
+html,body{margin:0;max-width:100%;overflow-x:hidden}body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:grid;grid-template-columns:360px minmax(0,1fr);min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden}
 .sidebar{padding:16px;border-right:1px solid var(--line);background:#11141a;overflow:auto;max-height:100vh}
-.main{padding:16px;display:flex;flex-direction:column;gap:14px}
+.main{padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0;max-width:100%}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .topbar h1{font-size:18px;margin:0}
 .iconbtn{width:38px;height:38px;padding:0;border-radius:9px;font-size:20px}
@@ -39,14 +43,14 @@ button.primary{background:var(--blue);border-color:var(--blue)}
 button.danger{border-color:#5c3030;color:#ffc2c2}
 button:disabled{opacity:.45;cursor:not-allowed}
 .mini-actions{display:flex;gap:7px;flex-wrap:wrap}
-.canvas-card{background:#151920;border:1px solid var(--line);border-radius:12px;padding:14px;flex:1;min-height:600px}
+.canvas-card{background:#151920;border:1px solid var(--line);border-radius:12px;padding:14px;flex:1;min-height:600px;min-width:0;max-width:100%}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .toolbar strong{font-size:14px}
 .toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
 .preview-wrap{
   position:relative;background:#e9edf2;border-radius:10px;min-height:520px;
-  overflow:auto;display:flex;align-items:center;justify-content:center;padding:75px;
-  transition:background .2s ease
+  overflow:hidden;display:flex;align-items:center;justify-content:center;padding:75px;
+  transition:background .2s ease;max-width:100%;min-width:0
 }
 .preview-wrap.white-flap-bg{background:#3a4049}
 .wide-tools-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
@@ -77,8 +81,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .dim.top{top:-36px;left:50%;transform:translateX(-50%)}
 .dim.left{left:-49px;top:50%;transform:translateY(-50%) rotate(-90deg)}
 .qty{
-  position:absolute;right:0;top:-42px;color:#222;background:white;border:1px solid #cbd2da;
-  border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;display:none
+  position:absolute;right:0;top:auto;bottom:-44px;color:#222;background:white;border:1px solid #cbd2da;
+  border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;display:none;
+  white-space:nowrap
 }
 .hint{color:var(--muted);font-size:12px;line-height:1.45}
 .tiny{font-size:11px;color:var(--muted);margin-top:6px}
@@ -249,6 +254,125 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
   border:1px solid #263f61;color:#bcd7fa;font-size:11px
 }
 
+
+.selection-actions{
+  display:none;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  padding:9px 10px;
+  margin:10px 0 0;
+  background:#111720;
+  border:1px solid #2c3949;
+  border-radius:10px;
+}
+.selection-actions.visible{display:flex}
+.selection-actions .selection-label{
+  color:#b8c7da;
+  font-size:11px;
+  margin-right:auto;
+}
+.share-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+  padding:10px 12px;
+  background:#11151b;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.share-bar-left,.share-bar-right{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap
+}
+.shortcut-hint{
+  font-size:11px;color:var(--muted);line-height:1.4
+}
+.item.multi-selected{
+  outline:2px dashed #9d7cff;
+  outline-offset:4px;
+}
+.item.selected.multi-selected{
+  outline-color:#61a6ff;
+}
+
+
+.color-control{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.color-row{
+  display:grid;
+  grid-template-columns:42px 1fr;
+  gap:7px;
+  align-items:center;
+}
+.color-native{
+  width:42px !important;
+  height:38px !important;
+  padding:2px !important;
+  border-radius:8px !important;
+  cursor:pointer;
+}
+.swatches{
+  display:grid;
+  grid-template-columns:repeat(8,24px);
+  gap:6px;
+  margin-top:2px
+}
+.swatch{
+  width:24px;height:24px;padding:0;border-radius:6px;border:2px solid transparent;
+  box-shadow:0 0 0 1px #3a424f;
+}
+.swatch:hover{transform:translateY(-1px)}
+.swatch.active{border-color:#fff;box-shadow:0 0 0 2px #2f80ed}
+
+
+.holes-summary .summary-toggle{
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  cursor:pointer;
+}
+.holes-summary::after{margin-left:8px !important}
+.summary-toggle input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.summary-toggle-ui{
+  width:34px;height:20px;border-radius:999px;
+  background:#343b46;border:1px solid #4a5360;
+  position:relative;display:block;transition:.18s ease;
+}
+.summary-toggle-ui::after{
+  content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;
+  border-radius:50%;background:#d6dbe2;transition:.18s ease;
+}
+.summary-toggle input:checked + .summary-toggle-ui{
+  background:#2f80ed;border-color:#4d95f2;
+}
+.summary-toggle input:checked + .summary-toggle-ui::after{
+  transform:translateX(14px);background:white;
+}
+.font-preview{
+  margin-top:7px;
+  min-height:48px;
+  display:flex;align-items:center;
+  padding:8px 11px;
+  border:1px solid #303640;
+  background:#11151b;
+  border-radius:8px;
+  color:#f1f4f7;
+  font-size:26px;
+  line-height:1;
+  overflow:hidden;
+  white-space:nowrap;
+}
+
 @media(max-width:950px){
   .app{grid-template-columns:1fr}.sidebar{max-height:none;border-right:none;border-bottom:1px solid var(--line)}
   .preview-wrap{padding:65px 35px}
@@ -284,7 +408,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <option value="#f3f3f3">Wit</option>
             </select>
           </div>
-          <div><label>Aantal</label><input id="qty" type="number" placeholder="Bijv. 12" min="1"></div>
+          <div><label>Quantity</label><input id="qty" type="number" placeholder="Bijv. 12" min="1"></div>
         </div>
 
         <details class="subdetails">
@@ -320,11 +444,16 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
     </details>
 
     <details class="section">
-      <summary><span class="section-num">2</span> Montagegaten</summary>
+      <summary class="holes-summary">
+        <span class="section-num">2</span>
+        <span>Montagegaten</span>
+        <label class="summary-toggle" title="Montagegaten aan/uit">
+          <input id="holesOn" type="checkbox" checked>
+          <span class="summary-toggle-ui"></span>
+        </label>
+      </summary>
       <div class="section-body">
-        <label class="check"><input id="holesOn" type="checkbox" checked> Montagegaten tonen</label>
-
-        <div style="margin-top:11px">
+        <div>
           <div class="row">
             <div><label>Aantal gaten</label><input id="holeCount" type="number" value="6" min="1" max="20"></div>
             <div><label>Vorm</label>
@@ -426,9 +555,11 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div><label>Grootte (cm)</label><input id="textSize" type="number" value="5" min="0.5" step="0.5"></div>
           <div>
             <label>Kleur</label>
-            <div class="color-combo">
-              <input id="textColor" type="color" value="#ffffff" title="Kies kleur">
-              <input id="textColorHex" type="text" value="#FFFFFF" maxlength="7" spellcheck="false">
+            <div class="color-control">
+              <div class="color-row">
+                <input id="textColor" class="color-native" type="color" value="#ffffff" title="Kies kleur / eyedropper">
+                <input id="textColorHex" type="text" value="#FFFFFF" maxlength="7" spellcheck="false">
+              </div>
             </div>
           </div>
         </div>
@@ -438,6 +569,23 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <option value="Arial, sans-serif">Arial</option>
             <option value="'Arial Black', Arial, sans-serif">Arial Black</option>
             <option value="Impact, sans-serif">Impact</option>
+            <optgroup label="Truck / Motorsport">
+              <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+              <option value="Anton, Impact, sans-serif">Anton</option>
+              <option value="Oswald, 'Arial Narrow', sans-serif">Oswald</option>
+              <option value="Teko, 'Arial Narrow', sans-serif">Teko</option>
+              <option value="'Russo One', Impact, sans-serif">Russo One</option>
+              <option value="'Black Ops One', Impact, sans-serif">Black Ops One</option>
+              <option value="Rajdhani, 'Arial Narrow', sans-serif">Rajdhani</option>
+            </optgroup>
+            <option value="'Arial Narrow', Arial, sans-serif">Arial Narrow</option>
+            <option value="'Franklin Gothic Medium', Arial, sans-serif">Franklin Gothic</option>
+            <option value="Rockwell, 'Rockwell Extra Bold', serif">Rockwell</option>
+            <option value="Copperplate, 'Copperplate Gothic Light', serif">Copperplate</option>
+            <option value="Futura, 'Trebuchet MS', sans-serif">Futura</option>
+            <option value="'DIN Condensed', 'Arial Narrow', sans-serif">DIN Condensed</option>
+            <option value="'Avenir Next Condensed', 'Arial Narrow', sans-serif">Avenir Condensed</option>
+            <option value="'Gill Sans', 'Trebuchet MS', sans-serif">Gill Sans</option>
             <option value="Verdana, sans-serif">Verdana</option>
             <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
             <option value="Tahoma, sans-serif">Tahoma</option>
@@ -445,7 +593,8 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <option value="'Times New Roman', serif">Times New Roman</option>
             <option value="'Courier New', monospace">Courier New</option>
           </select>
-          <div class="field-help">Compacte, betrouwbare fonts zonder externe fontserver.</div>
+          <div id="textFontPreview" class="font-preview">Voorbeeld</div>
+          <div class="field-help">Het eerste woord wordt hierboven direct in het gekozen lettertype getoond. De Truck / Motorsport-fonts laden online en vallen anders terug op een vergelijkbaar systeemfont.</div>
         </div>
         <button id="addText" style="width:100%">+ Tekst toevoegen</button>
 
@@ -460,9 +609,11 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <div class="row">
               <div>
                 <label>Kleur</label>
-                <div class="color-combo">
-                  <input id="editTextColor" type="color">
-                  <input id="editTextColorHex" type="text" value="#FFFFFF" maxlength="7" spellcheck="false">
+                <div class="color-control">
+                  <div class="color-row">
+                    <input id="editTextColor" class="color-native" type="color" value="#ffffff" title="Kies kleur / eyedropper">
+                    <input id="editTextColorHex" type="text" value="#FFFFFF" maxlength="7" spellcheck="false">
+                  </div>
                 </div>
               </div>
               <div><label>Uitlijning</label>
@@ -476,16 +627,34 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <div style="margin-bottom:9px">
               <label>Lettertype</label>
               <select id="editTextFont">
-                <option value="Arial, sans-serif">Arial</option>
-                <option value="'Arial Black', Arial, sans-serif">Arial Black</option>
-                <option value="Impact, sans-serif">Impact</option>
-                <option value="Verdana, sans-serif">Verdana</option>
-                <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
-                <option value="Tahoma, sans-serif">Tahoma</option>
-                <option value="Georgia, serif">Georgia</option>
-                <option value="'Times New Roman', serif">Times New Roman</option>
-                <option value="'Courier New', monospace">Courier New</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Arial Black', Arial, sans-serif">Arial Black</option>
+            <option value="Impact, sans-serif">Impact</option>
+            <optgroup label="Truck / Motorsport">
+              <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+              <option value="Anton, Impact, sans-serif">Anton</option>
+              <option value="Oswald, 'Arial Narrow', sans-serif">Oswald</option>
+              <option value="Teko, 'Arial Narrow', sans-serif">Teko</option>
+              <option value="'Russo One', Impact, sans-serif">Russo One</option>
+              <option value="'Black Ops One', Impact, sans-serif">Black Ops One</option>
+              <option value="Rajdhani, 'Arial Narrow', sans-serif">Rajdhani</option>
+            </optgroup>
+            <option value="'Arial Narrow', Arial, sans-serif">Arial Narrow</option>
+            <option value="'Franklin Gothic Medium', Arial, sans-serif">Franklin Gothic</option>
+            <option value="Rockwell, 'Rockwell Extra Bold', serif">Rockwell</option>
+            <option value="Copperplate, 'Copperplate Gothic Light', serif">Copperplate</option>
+            <option value="Futura, 'Trebuchet MS', sans-serif">Futura</option>
+            <option value="'DIN Condensed', 'Arial Narrow', sans-serif">DIN Condensed</option>
+            <option value="'Avenir Next Condensed', 'Arial Narrow', sans-serif">Avenir Condensed</option>
+            <option value="'Gill Sans', 'Trebuchet MS', sans-serif">Gill Sans</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+            <option value="Tahoma, sans-serif">Tahoma</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Courier New', monospace">Courier New</option>
               </select>
+              <div id="editTextFontPreview" class="font-preview">Voorbeeld</div>
             </div>
             <div class="mini-actions">
               <button id="centerText">Centreren</button>
@@ -540,17 +709,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
       </div>
     </details>
 
-    <details class="section">
-      <summary><span class="section-num">6</span> Delen</summary>
-      <div class="section-body">
-        <div class="mini-actions">
-          <button id="copyUrl" style="flex:1">🔗 Link kopiëren</button>
-          <button id="openCopy" style="flex:1">↗ Kopie openen</button>
-        </div>
-        <div id="shareStatus" class="status"></div>
-        <div class="field-help">“Kopie openen” opent exact deze configuratie in een nieuw tabblad.</div>
-      </div>
-    </details>
+
   </aside>
 
   <main class="main">
@@ -561,10 +720,9 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div class="hint">Klik op een logo/tekst om het te selecteren. Sleep om te verplaatsen.</div>
         </div>
         <div class="toolbar-actions">
-          <button id="deleteSelected" class="danger quick-delete">Verwijder selectie</button>
           <button id="downloadArtworkPng">Artwork PNG</button>
           <button id="downloadArtworkPdf">Artwork PDF</button>
-          <button id="download" class="primary">Preview PNG</button>
+          <button id="download" class="primary" title="Downloadt de preview en probeert hem ook naar het klembord te kopiëren">Preview PNG</button>
         </div>
       </div>
       <div class="preview-wrap" id="previewWrap">
@@ -573,6 +731,24 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div class="dim left" id="dimLeft">25 cm</div>
           <div class="qty" id="qtyBadge"></div>
           <div id="flap"></div>
+        </div>
+      </div>
+
+      <div id="selectionActions" class="selection-actions">
+        <span id="selectionLabel" class="selection-label">1 onderdeel geselecteerd</span>
+        <button id="copySelected">Kopiëren</button>
+        <button id="duplicateSelected">Dupliceren</button>
+        <button id="deleteSelected" class="danger">Verwijderen</button>
+      </div>
+
+      <div class="share-bar">
+        <div class="share-bar-left">
+          <button id="copyUrl">🔗 Link kopiëren</button>
+          <button id="openCopy">↗ Kopie openen</button>
+          <div id="shareStatus" class="status"></div>
+        </div>
+        <div class="share-bar-right">
+          <span class="shortcut-hint">Pijltjes = verplaatsen · Shift+klik = meerdere selecteren · Ctrl/Cmd C/V/Z</span>
         </div>
       </div>
     </div>
@@ -596,6 +772,12 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
 <script>
 const $=id=>document.getElementById(id);
 const controls=['w','h','qty','shape','radius','shoulderInset','shoulderTopH','flapColor','holesOn','holeCount','holeShape','topGap','sideGap','holeH','holeW'];
+const holesToggleWrap=$('holesOn')?.closest('.summary-toggle');
+if(holesToggleWrap){
+  holesToggleWrap.addEventListener('click',e=>e.stopPropagation());
+  holesToggleWrap.addEventListener('pointerdown',e=>e.stopPropagation());
+}
+
 
 let state={
   logos:[], texts:[], selected:null, selectedType:null,
@@ -607,6 +789,8 @@ let history=[];
 let redoHistory=[];
 let suppressHistory=false;
 let drag=null;
+let multiSelection=[]; // array of {id,type}; primary selection remains state.selected/state.selectedType
+let internalClipboard=[];
 
 function cloneState(){
   return JSON.parse(JSON.stringify(state));
@@ -660,8 +844,12 @@ function toast(message){
 
 function scaleFactor(){
   const w=Math.max(10,state.flap.w),h=Math.max(5,state.flap.h);
-  const maxW=Math.min(980,window.innerWidth>1000?window.innerWidth-500:window.innerWidth-100);
-  return Math.min(maxW/w,360/h);
+  const wrap=$('previewWrap');
+  const availableW=wrap ? Math.max(180,wrap.clientWidth-150) : Math.max(180,window.innerWidth-500);
+  const availableH=wrap ? Math.max(180,wrap.clientHeight-150) : 360;
+  const maxW=Math.min(980,availableW);
+  const maxH=Math.min(360,availableH);
+  return Math.max(.1,Math.min(maxW/w,maxH/h));
 }
 function readBaseControls(){
   state.flap.w=Math.max(10,Number($('w').value)||190);
@@ -704,12 +892,60 @@ function syncUIFromState(){
   syncSelectionControls();
 }
 
+
+function selectionKey(id,type){return `${type}:${id}`;}
+function allSelectedRefs(){
+  const refs=[];
+  if(state.selected && state.selectedType) refs.push({id:state.selected,type:state.selectedType});
+  multiSelection.forEach(r=>{
+    if(!refs.some(x=>x.id===r.id && x.type===r.type)) refs.push({id:r.id,type:r.type});
+  });
+  return refs;
+}
+function isSelectedRef(id,type){
+  return (state.selected===id && state.selectedType===type) ||
+    multiSelection.some(r=>r.id===id && r.type===type);
+}
+function clearMultiSelection(){
+  multiSelection=[];
+}
+function toggleMultiSelection(id,type){
+  const i=multiSelection.findIndex(r=>r.id===id && r.type===type);
+  if(i>=0){
+    multiSelection.splice(i,1);
+    if(state.selected===id && state.selectedType===type){
+      const next=multiSelection.shift()||null;
+      state.selected=next?.id||null;
+      state.selectedType=next?.type||null;
+    }
+  }else{
+    if(state.selected && state.selectedType && !multiSelection.some(r=>r.id===state.selected && r.type===state.selectedType)){
+      multiSelection.push({id:state.selected,type:state.selectedType});
+    }
+    state.selected=id;
+    state.selectedType=type;
+  }
+}
+function updateSelectionActionBar(){
+  const refs=allSelectedRefs();
+  const bar=$('selectionActions');
+  if(!bar)return;
+  bar.classList.toggle('visible',refs.length>0);
+  if(refs.length){
+    $('selectionLabel').textContent=refs.length===1?'1 onderdeel geselecteerd':`${refs.length} onderdelen geselecteerd`;
+  }
+}
+
 function itemById(id,type){
   return (type==='logo'?state.logos:state.texts).find(x=>x.id===id);
 }
 
-function setSelected(id,type){
-  state.selected=id;state.selectedType=type;
+function setSelected(id,type,additive=false){
+  if(additive){
+    toggleMultiSelection(id,type);
+  }else{
+    state.selected=id;state.selectedType=type;clearMultiSelection();
+  }
   if(type==='logo' && $('logosSection')) $('logosSection').open=true;
   syncSelectionControls();render();
 }
@@ -737,8 +973,9 @@ function syncSelectionControls(){
     $('editTextColorHex').value=normalizeHex(txt.color).toUpperCase();
     $('editTextAlign').value=txt.align||'center';
     $('editTextFont').value=txt.font;
+    if(typeof updateFontPreviews==='function')updateFontPreviews();
   }
-  $('deleteSelected').classList.toggle('visible',!!selectedObject());
+  updateSelectionActionBar();
 }
 
 
@@ -751,16 +988,7 @@ function normalizeHex(value){
   if(!/^#[0-9a-fA-F]{6}$/.test(v))return '#FFFFFF';
   return v.toUpperCase();
 }
-function syncColorPair(pickerId,hexId,source){
-  const picker=$(pickerId),hex=$(hexId);
-  if(source==='picker'){
-    hex.value=normalizeHex(picker.value);
-  }else{
-    const v=normalizeHex(hex.value);
-    hex.value=v;
-    picker.value=v;
-  }
-}
+
 
 function makeCompressedDataUrl(file){
   return new Promise((resolve,reject)=>{
@@ -864,18 +1092,67 @@ $('fitItem').onclick=()=>{
 $('deleteItem').onclick=deleteSelectedObject;
 
 
-$('textColor').addEventListener('input',()=>syncColorPair('textColor','textColorHex','picker'));
-$('textColorHex').addEventListener('change',()=>syncColorPair('textColor','textColorHex','hex'));
-$('editTextColor').addEventListener('input',()=>{
-  syncColorPair('editTextColor','editTextColorHex','picker');
-  const t=itemById(state.selected,'text');if(!t)return;
-  t.color=$('editTextColor').value;render();
-});
-$('editTextColorHex').addEventListener('change',()=>{
-  syncColorPair('editTextColor','editTextColorHex','hex');
-  const t=itemById(state.selected,'text');if(!t)return;
-  pushHistory();t.color=$('editTextColor').value;render();
-});
+function setCustomColor(group,color,commit=false){
+  color=normalizeHex(color);
+  const hex=$(group+'Hex');
+  const picker=$(group);
+  if(hex)hex.value=color;
+  if(picker && picker.type==='color')picker.value=color;
+
+  const wrap=$(group+'Swatches');
+  if(wrap){
+    wrap.querySelectorAll('.swatch').forEach(b=>{
+      b.classList.toggle('active',normalizeHex(b.dataset.color)===color);
+    });
+  }
+
+  if(group==='editTextColor'){
+    const t=itemById(state.selected,'text');
+    if(t){
+      if(commit)pushHistory();
+      t.color=color;
+      render();
+    }
+  }
+}
+
+$('textColor').addEventListener('input',()=>setCustomColor('textColor',$('textColor').value,false));
+$('editTextColor').addEventListener('input',()=>setCustomColor('editTextColor',$('editTextColor').value,true));
+$('textColorHex').addEventListener('change',()=>setCustomColor('textColor',$('textColorHex').value,false));
+$('editTextColorHex').addEventListener('change',()=>setCustomColor('editTextColor',$('editTextColorHex').value,true));
+
+
+setCustomColor('textColor','#FFFFFF',false);
+
+
+function firstWord(value){
+  const v=String(value||'').trim();
+  return v ? v.split(/\s+/)[0] : 'Voorbeeld';
+}
+function updateFontPreviews(){
+  const apply=()=>{
+    const p=$('textFontPreview');
+    if(p){
+      p.textContent=firstWord($('textValue')?.value);
+      p.style.fontFamily=$('textFont')?.value||'Arial, sans-serif';
+    }
+    const ep=$('editTextFontPreview');
+    if(ep){
+      ep.textContent=firstWord($('editText')?.value);
+      ep.style.fontFamily=$('editTextFont')?.value||'Arial, sans-serif';
+    }
+  };
+  if(document.fonts?.ready){
+    document.fonts.ready.then(apply).catch(apply);
+  }else{
+    apply();
+  }
+}
+$('textValue').addEventListener('input',updateFontPreviews);
+$('textFont').addEventListener('change',updateFontPreviews);
+$('editText').addEventListener('input',updateFontPreviews);
+$('editTextFont').addEventListener('change',updateFontPreviews);
+updateFontPreviews();
 
 $('addText').onclick=()=>{
   const v=$('textValue').value.trim();if(!v)return;pushHistory();
@@ -887,35 +1164,139 @@ $('addText').onclick=()=>{
   $(id).addEventListener('change',()=>{
     const t=itemById(state.selected,'text');if(!t)return;pushHistory();
     t.text=$('editText').value;t.size=Math.max(.5,Number($('editTextSize').value)||1);
-    t.color=$('editTextColor').value;t.align=$('editTextAlign').value;t.font=$('editTextFont').value||'Arial, sans-serif';render();
+    t.color=normalizeHex($('editTextColorHex').value);t.align=$('editTextAlign').value;t.font=$('editTextFont').value||'Arial, sans-serif';render();
   });
 });
 $('centerText').onclick=()=>{const t=itemById(state.selected,'text');if(!t)return;pushHistory();t.x=.5;t.y=.5;render();};
 
 function deleteSelectedObject(){
-  if(!state.selected || !state.selectedType)return;
+  const refs=allSelectedRefs();
+  if(!refs.length)return;
   pushHistory();
-  if(state.selectedType==='logo'){
-    state.logos=state.logos.filter(x=>x.id!==state.selected);
-  }else if(state.selectedType==='text'){
-    state.texts=state.texts.filter(x=>x.id!==state.selected);
-  }
+  const logoIds=new Set(refs.filter(r=>r.type==='logo').map(r=>r.id));
+  const textIds=new Set(refs.filter(r=>r.type==='text').map(r=>r.id));
+  state.logos=state.logos.filter(x=>!logoIds.has(x.id));
+  state.texts=state.texts.filter(x=>!textIds.has(x.id));
   state.selected=null;
   state.selectedType=null;
+  clearMultiSelection();
   syncSelectionControls();
   render();
-  toast('Onderdeel verwijderd');
+  toast(refs.length===1?'Onderdeel verwijderd':`${refs.length} onderdelen verwijderd`);
 }
 $('deleteSelected').onclick=deleteSelectedObject;
 
+function cloneSelectedForClipboard(){
+  const refs=allSelectedRefs();
+  return refs.map(r=>{
+    const obj=itemById(r.id,r.type);
+    return obj?{type:r.type,data:JSON.parse(JSON.stringify(obj))}:null;
+  }).filter(Boolean);
+}
+function copySelectedObjects(){
+  const copied=cloneSelectedForClipboard();
+  if(!copied.length)return;
+  internalClipboard=copied;
+  toast(copied.length===1?'Onderdeel gekopieerd':`${copied.length} onderdelen gekopieerd`);
+}
+function pasteInternalClipboard(offsetCm=.8){
+  if(!internalClipboard.length){toast('Niets om te plakken');return;}
+  pushHistory();
+  clearMultiSelection();
+  let first=null;
+  internalClipboard.forEach((entry,i)=>{
+    const d=JSON.parse(JSON.stringify(entry.data));
+    if(entry.type==='logo'){
+      d.id='l'+Date.now()+Math.random();
+      d.name=(d.name||'Logo').replace(/\s*\(kopie\)$/,'')+' (kopie)';
+      d.x=Math.min(1,Math.max(0,d.x+offsetCm/state.flap.w));
+      d.y=Math.min(1,Math.max(0,d.y+offsetCm/state.flap.h));
+      state.logos.push(d);
+    }else{
+      d.id='t'+Date.now()+Math.random();
+      d.x=Math.min(1,Math.max(0,d.x+offsetCm/state.flap.w));
+      d.y=Math.min(1,Math.max(0,d.y+offsetCm/state.flap.h));
+      state.texts.push(d);
+    }
+    if(!first)first={id:d.id,type:entry.type};
+    else multiSelection.push({id:d.id,type:entry.type});
+  });
+  state.selected=first?.id||null;
+  state.selectedType=first?.type||null;
+  syncSelectionControls();render();
+  toast(internalClipboard.length===1?'Onderdeel geplakt':`${internalClipboard.length} onderdelen geplakt`);
+}
+function duplicateSelectedObjects(){
+  const copied=cloneSelectedForClipboard();
+  if(!copied.length)return;
+  internalClipboard=copied;
+  pasteInternalClipboard(.8);
+  toast(copied.length===1?'Onderdeel gedupliceerd':`${copied.length} onderdelen gedupliceerd`);
+}
+function cutSelectedObjects(){
+  const copied=cloneSelectedForClipboard();
+  if(!copied.length)return;
+  internalClipboard=copied;
+  deleteSelectedObject();
+  toast(copied.length===1?'Onderdeel geknipt':`${copied.length} onderdelen geknipt`);
+}
+$('copySelected').onclick=copySelectedObjects;
+$('duplicateSelected').onclick=duplicateSelectedObjects;
+
+
 document.addEventListener('keydown',e=>{
-  if(e.key!=='Delete' && e.key!=='Backspace')return;
   const tag=(document.activeElement?.tagName||'').toLowerCase();
   const editable=document.activeElement?.isContentEditable;
-  if(tag==='input' || tag==='textarea' || tag==='select' || editable)return;
-  if(state.selected){
+  const typing=tag==='input' || tag==='textarea' || tag==='select' || editable;
+  const mod=e.ctrlKey || e.metaKey;
+  const key=e.key.toLowerCase();
+
+  // Standard editor shortcuts only when not typing in a field.
+  if(!typing && mod && key==='c'){
+    e.preventDefault();copySelectedObjects();return;
+  }
+  if(!typing && mod && key==='v'){
+    e.preventDefault();pasteInternalClipboard();return;
+  }
+  if(!typing && mod && key==='x'){
+    e.preventDefault();cutSelectedObjects();return;
+  }
+  if(!typing && mod && key==='d'){
+    e.preventDefault();duplicateSelectedObjects();return;
+  }
+  if(!typing && mod && key==='z' && !e.shiftKey){
+    e.preventDefault();undo();return;
+  }
+  if(!typing && ((mod && key==='z' && e.shiftKey) || (mod && key==='y'))){
+    e.preventDefault();redo();return;
+  }
+
+  if(!typing && (e.key==='Delete' || e.key==='Backspace')){
+    if(allSelectedRefs().length){
+      e.preventDefault();deleteSelectedObject();
+    }
+    return;
+  }
+
+  if(!typing && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
+    const refs=allSelectedRefs();
+    if(!refs.length)return;
     e.preventDefault();
-    deleteSelectedObject();
+
+    // Fine movement: 0.5 cm. Hold Shift for 2 cm.
+    const step=e.shiftKey?2:.5;
+    const dx=e.key==='ArrowLeft'?-step:e.key==='ArrowRight'?step:0;
+    const dy=e.key==='ArrowUp'?-step:e.key==='ArrowDown'?step:0;
+
+    pushHistory();
+    refs.forEach(r=>{
+      const obj=itemById(r.id,r.type);
+      if(!obj)return;
+      obj.x=Math.max(0,Math.min(1,obj.x+dx/state.flap.w));
+      obj.y=Math.max(0,Math.min(1,obj.y+dy/state.flap.h));
+    });
+    syncSelectionControls();render();
+    return;
   }
 });
 
@@ -1078,9 +1459,10 @@ function renderLists(){
     const name=document.createElement('span');name.textContent=`Logo ${i+1}: ${x.name}`;
     const actions=document.createElement('div');actions.className='list-actions';
     const b=document.createElement('button');b.textContent='Selecteer';b.onclick=()=>setSelected(x.id,'logo');
+    const dup=document.createElement('button');dup.textContent='⧉';dup.title='Dupliceren';dup.onclick=e=>{e.stopPropagation();setSelected(x.id,'logo');duplicateSelectedObjects();};
     const del=document.createElement('button');del.className='trash';del.textContent='×';del.title='Verwijderen';
     del.onclick=e=>{e.stopPropagation();state.selected=x.id;state.selectedType='logo';deleteSelectedObject();toast('Logo verwijderd');};
-    actions.append(b,del);d.append(name,actions);ll.appendChild(d);
+    actions.append(b,dup,del);d.append(name,actions);ll.appendChild(d);
   });
 
   const tl=$('textList');tl.innerHTML='';
@@ -1089,9 +1471,10 @@ function renderLists(){
     const name=document.createElement('span');name.textContent=`Tekst ${i+1}: ${x.text.substring(0,24)}`;
     const actions=document.createElement('div');actions.className='list-actions';
     const b=document.createElement('button');b.textContent='Selecteer';b.onclick=()=>setSelected(x.id,'text');
+    const dup=document.createElement('button');dup.textContent='⧉';dup.title='Dupliceren';dup.onclick=e=>{e.stopPropagation();setSelected(x.id,'text');duplicateSelectedObjects();};
     const del=document.createElement('button');del.className='trash';del.textContent='×';del.title='Verwijderen';
     del.onclick=e=>{e.stopPropagation();state.selected=x.id;state.selectedType='text';deleteSelectedObject();toast('Tekst verwijderd');};
-    actions.append(b,del);d.append(name,actions);tl.appendChild(d);
+    actions.append(b,dup,del);d.append(name,actions);tl.appendChild(d);
   });
 }
 
@@ -1122,7 +1505,7 @@ function render(){
   }
   $('dimTop').textContent=`${w} cm`;$('dimLeft').textContent=`${h} cm`;
   const q=$('qtyBadge');
-  if(String(state.flap.qty).trim()){q.style.display='block';q.textContent=`Aantal: ${state.flap.qty}`;}else q.style.display='none';
+  if(String(state.flap.qty).trim()){q.style.display='block';q.textContent=`Quantity: ${state.flap.qty}`;}else q.style.display='none';
 
   flap.innerHTML='';
 
@@ -1156,26 +1539,28 @@ function render(){
 
   state.logos.forEach(x=>{
     const img=document.createElement('img');img.src=x.src;img.draggable=false;
-    img.className='item logo-item'+(state.selected===x.id&&state.selectedType==='logo'?' selected':'');
+    img.className='item logo-item'+(state.selected===x.id&&state.selectedType==='logo'?' selected':'')+(multiSelection.some(r=>r.id===x.id&&r.type==='logo')?' multi-selected':'');
     img.style.left=(x.x*100)+'%';img.style.top=(x.y*100)+'%';
     img.style.width=(x.w*s)+'px';img.style.height=(x.h*s)+'px';
-    bindDrag(img,x,'logo');img.onclick=e=>{e.stopPropagation();setSelected(x.id,'logo')};flap.appendChild(img);
+    bindDrag(img,x,'logo');img.onclick=e=>{e.stopPropagation();setSelected(x.id,'logo',e.shiftKey)};flap.appendChild(img);
   });
   state.texts.forEach(t=>{
     const d=document.createElement('div');d.textContent=t.text;
-    d.className='item text-item'+(state.selected===t.id&&state.selectedType==='text'?' selected':'');
+    d.className='item text-item'+(state.selected===t.id&&state.selectedType==='text'?' selected':'')+(multiSelection.some(r=>r.id===t.id&&r.type==='text')?' multi-selected':'');
     d.style.left=(t.x*100)+'%';d.style.top=(t.y*100)+'%';d.style.fontSize=(t.size*s)+'px';d.style.color=t.color;
     d.style.fontFamily=t.font||'Arial, sans-serif';
     d.style.textAlign=t.align||'center';
-    bindDrag(d,t,'text');d.onclick=e=>{e.stopPropagation();setSelected(t.id,'text')};flap.appendChild(d);
+    bindDrag(d,t,'text');d.onclick=e=>{e.stopPropagation();setSelected(t.id,'text',e.shiftKey)};flap.appendChild(d);
   });
   renderLists();
   updateWideToolButtons();
+  updateSelectionActionBar();
 }
 
 function bindDrag(el,obj,type){
   el.addEventListener('pointerdown',e=>{
-    e.stopPropagation();setSelected(obj.id,type);
+    e.stopPropagation();
+    setSelected(obj.id,type,e.shiftKey);
     const rect=$('flap').getBoundingClientRect();
     drag={obj,type,dx:e.clientX-(rect.left+obj.x*rect.width),dy:e.clientY-(rect.top+obj.y*rect.height),moved:false,snapshot:cloneState()};
     el.setPointerCapture(e.pointerId);
@@ -1196,7 +1581,7 @@ function bindDrag(el,obj,type){
   el.addEventListener('pointercancel',()=>drag=null);
 }
 
-$('flap').addEventListener('click',()=>{state.selected=null;state.selectedType=null;syncSelectionControls();render();});
+$('flap').addEventListener('click',()=>{state.selected=null;state.selectedType=null;clearMultiSelection();syncSelectionControls();render();});
 
 function roundRectPath(ctx,x,y,w,h,rTL,rTR,rBR,rBL){
   const max=Math.min(w/2,h/2);rTL=Math.min(rTL,max);rTR=Math.min(rTR,max);rBR=Math.min(rBR,max);rBL=Math.min(rBL,max);
@@ -1249,64 +1634,128 @@ function shoulderRoundedPath(ctx,w,h,inset,topH,r){
 }
 
 async function exportPNG(){
-  const pxPerCm=12;
-  const W=Math.round(state.flap.w*pxPerCm),H=Math.round(state.flap.h*pxPerCm);
-  const c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');
-  const rr=state.flap.radius*pxPerCm;
-  ctx.save();
-  if(state.flap.shape==='square')roundRectPath(ctx,0,0,W,H,0,0,0,0);
-  if(state.flap.shape==='bottom')roundRectPath(ctx,0,0,W,H,0,0,rr,rr);
-  if(state.flap.shape==='all')roundRectPath(ctx,0,0,W,H,rr,rr,rr,rr);
-  if(state.flap.shape==='shoulder')shoulderRoundedPath(ctx,W,H,(state.flap.shoulderInset||5)*pxPerCm,(state.flap.shoulderTopH||5)*pxPerCm,rr);
-  ctx.clip();ctx.fillStyle=state.flap.color;ctx.fillRect(0,0,W,H);
+  if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
+  // Screenshot-style export of the live preview area.
+  const wrap=$('previewWrap');
+  const flap=$('flap');
+  if(!wrap || !flap)return;
 
+  const wrapRect=wrap.getBoundingClientRect();
+  const flapRect=flap.getBoundingClientRect();
+  const scale=2;
+
+  const c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(wrapRect.width*scale));
+  c.height=Math.max(1,Math.round(wrapRect.height*scale));
+  const ctx=c.getContext('2d');
+  ctx.scale(scale,scale);
+
+  const wrapStyle=getComputedStyle(wrap);
+  const workspaceBg=wrapStyle.backgroundColor || '#e9edf2';
+  ctx.fillStyle=workspaceBg;
+  ctx.fillRect(0,0,wrapRect.width,wrapRect.height);
+
+  const ox=flapRect.left-wrapRect.left;
+  const oy=flapRect.top-wrapRect.top;
+  const fw=flapRect.width;
+  const fh=flapRect.height;
+  const pxPerCmX=fw/state.flap.w;
+  const pxPerCmY=fh/state.flap.h;
+  const rPx=(state.flap.radius||0)*pxPerCmY;
+
+  // Flap shape.
+  ctx.save();
+  if(state.flap.shape==='square'){
+    roundRectPath(ctx,ox,oy,fw,fh,0,0,0,0);
+  }else if(state.flap.shape==='bottom'){
+    roundRectPath(ctx,ox,oy,fw,fh,0,0,rPx,rPx);
+  }else if(state.flap.shape==='all'){
+    roundRectPath(ctx,ox,oy,fw,fh,rPx,rPx,rPx,rPx);
+  }else if(state.flap.shape==='shoulder'){
+    ctx.translate(ox,oy);
+    shoulderRoundedPath(
+      ctx,fw,fh,
+      (state.flap.shoulderInset||5)*pxPerCmX,
+      (state.flap.shoulderTopH||5)*pxPerCmY,
+      rPx
+    );
+    ctx.translate(-ox,-oy);
+  }
+  ctx.clip();
+  ctx.fillStyle=getComputedStyle(flap).backgroundColor || state.flap.color;
+  ctx.fillRect(ox,oy,fw,fh);
+
+  // Wide-mode guides.
+  if(state.ui?.wideMode && state.ui?.zones){
+    const center=Math.max(30,Math.min(90,Number(state.ui.zoneCenter)||50));
+    const side=(100-center)/2;
+    ctx.save();
+    ctx.setLineDash([5,4]);
+    ctx.strokeStyle='rgba(80,160,255,.75)';
+    ctx.lineWidth=1;
+    [side,100-side].forEach(p=>{
+      const x=ox+fw*(p/100);
+      ctx.beginPath();ctx.moveTo(x,oy);ctx.lineTo(x,oy+fh);ctx.stroke();
+    });
+    ctx.restore();
+
+    ctx.font='700 10px Arial';
+    ctx.textAlign='center';
+    ctx.textBaseline='top';
+    [['LINKS',side/2],['MIDDEN',50],['RECHTS',100-side/2]].forEach(([label,p])=>{
+      const tx=ox+fw*(p/100), ty=oy+7;
+      const tw=ctx.measureText(label).width+12;
+      ctx.fillStyle='rgba(0,0,0,.28)';
+      roundRectPath(ctx,tx-tw/2,ty,tw,20,5,5,5,5);
+      ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.72)';
+      ctx.fillText(label,tx,ty+4);
+    });
+  }
+
+  // Holes.
   if(state.holes.on){
-    const count=state.holes.count,side=state.holes.side,top=state.holes.top;
-    const xs=count===1?[state.flap.w/2]:Array.from({length:count},(_,i)=>side+(state.flap.w-2*side)*(i/(count-1)));
-    ctx.globalCompositeOperation='destination-out';
-    ctx.fillStyle='#000';
-    xs.forEach(x=>{
-      const cx=x*pxPerCm,cy=top*pxPerCm,hh=state.holes.h*pxPerCm,hw=(state.holes.shape==='pill'?Math.max(state.holes.h,state.holes.w):state.holes.h)*pxPerCm;
+    const count=state.holes.count, side=state.holes.side, top=state.holes.top;
+    const xs=count===1
+      ? [state.flap.w/2]
+      : Array.from({length:count},(_,i)=>side+(state.flap.w-2*side)*(i/(count-1)));
+
+    ctx.fillStyle=workspaceBg;
+    xs.forEach(xcm=>{
+      const cx=ox+xcm*pxPerCmX;
+      const cy=oy+top*pxPerCmY;
+      const hh=state.holes.h*pxPerCmY;
+      const hw=(state.holes.shape==='pill'?Math.max(state.holes.h,state.holes.w):state.holes.h)*pxPerCmX;
       ctx.beginPath();
-      if(state.holes.shape==='round'){ctx.arc(cx,cy,hh/2,0,Math.PI*2);}
-      else{
-        const r=hh/2,xx=cx-hw/2,yy=cy-hh/2;
-        roundRectPath(ctx,xx,yy,hw,hh,r,r,r,r);
+      if(state.holes.shape==='round'){
+        ctx.arc(cx,cy,hh/2,0,Math.PI*2);
+      }else{
+        const rr=hh/2;
+        roundRectPath(ctx,cx-hw/2,cy-hh/2,hw,hh,rr,rr,rr,rr);
       }
       ctx.fill();
     });
-    ctx.globalCompositeOperation='source-over';
   }
 
-  for(const x of state.logos){
-    await new Promise(res=>{
-      const img=new Image();img.onload=()=>{ctx.drawImage(img,x.x*W-x.w*pxPerCm/2,x.y*H-x.h*pxPerCm/2,x.w*pxPerCm,x.h*pxPerCm);res();};
-      img.onerror=res;img.src=x.src;
-    });
-  }
-  state.texts.forEach(t=>{
-    const fs=t.size*pxPerCm;ctx.font=`700 ${fs}px ${t.font||'Arial, sans-serif'}`;ctx.fillStyle=t.color;ctx.textBaseline='middle';
-    ctx.textAlign=t.align||'center';let x=t.x*W;
-    if(t.align==='left')x-=ctx.measureText(t.text).width/2;
-    if(t.align==='right')x+=ctx.measureText(t.text).width/2;
-    ctx.fillText(t.text,x,t.y*H);
-  });
-  ctx.restore();
-  const a=document.createElement('a');a.download=`spatlap-${state.flap.w}x${state.flap.h}cm.png`;a.href=c.toDataURL('image/png');a.click();
-}
-
-async function buildArtworkCanvas(scale=12){
-  const W=Math.max(1,Math.round(state.flap.w*scale));
-  const H=Math.max(1,Math.round(state.flap.h*scale));
-  const c=document.createElement('canvas');
-  c.width=W;c.height=H;
-  const ctx=c.getContext('2d');
-
+  // Logos.
   for(const x of state.logos){
     await new Promise(res=>{
       const img=new Image();
       img.onload=()=>{
-        ctx.drawImage(img,x.x*W-x.w*scale/2,x.y*H-x.h*scale/2,x.w*scale,x.h*scale);
+        const iw=x.w*pxPerCmX;
+        const ih=x.h*pxPerCmY;
+        const ix=ox+x.x*fw-iw/2;
+        const iy=oy+x.y*fh-ih/2;
+        ctx.drawImage(img,ix,iy,iw,ih);
+
+        if(typeof isSelectedRef==='function' && isSelectedRef(x.id,'logo')){
+          ctx.save();
+          ctx.setLineDash([5,4]);
+          ctx.strokeStyle=(state.selected===x.id&&state.selectedType==='logo')?'#61a6ff':'#9d7cff';
+          ctx.lineWidth=2;
+          ctx.strokeRect(ix-4,iy-4,iw+8,ih+8);
+          ctx.restore();
+        }
         res();
       };
       img.onerror=res;
@@ -1314,63 +1763,114 @@ async function buildArtworkCanvas(scale=12){
     });
   }
 
+  // Text.
   state.texts.forEach(t=>{
-    const fs=t.size*scale;
+    const fs=t.size*pxPerCmY;
     ctx.font=`700 ${fs}px ${t.font||'Arial, sans-serif'}`;
     ctx.fillStyle=t.color;
     ctx.textBaseline='middle';
     ctx.textAlign=t.align||'center';
-    let x=t.x*W;
-    if(t.align==='left')x-=ctx.measureText(t.text).width/2;
-    if(t.align==='right')x+=ctx.measureText(t.text).width/2;
-    ctx.fillText(t.text,x,t.y*H);
-  });
-  return c;
-}
 
-$('downloadArtworkPng').onclick=async()=>{
-  const c=await buildArtworkCanvas(14);
-  const a=document.createElement('a');
-  a.download=`artwork-${state.flap.w}x${state.flap.h}cm.png`;
-  a.href=c.toDataURL('image/png');
-  a.click();
-  toast('Artwork PNG gemaakt');
-};
+    let tx=ox+t.x*fw;
+    const ty=oy+t.y*fh;
+    const mw=ctx.measureText(t.text).width;
+    if(t.align==='left')tx-=mw/2;
+    if(t.align==='right')tx+=mw/2;
+    ctx.fillText(t.text,tx,ty);
 
-function escXml(s){
-  return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[ch]));
-}
-function artworkSvg(){
-  const w=state.flap.w,h=state.flap.h;
-  let parts=[`<svg xmlns="http://www.w3.org/2000/svg" width="${w}cm" height="${h}cm" viewBox="0 0 ${w} ${h}">`];
-  state.logos.forEach(x=>{
-    parts.push(`<image href="${x.src}" x="${x.x*w-x.w/2}" y="${x.y*h-x.h/2}" width="${x.w}" height="${x.h}" preserveAspectRatio="none"/>`);
+    if(typeof isSelectedRef==='function' && isSelectedRef(t.id,'text')){
+      const boxH=fs*1.15;
+      const bx=ox+t.x*fw-mw/2;
+      const by=ty-boxH/2;
+      ctx.save();
+      ctx.setLineDash([5,4]);
+      ctx.strokeStyle=(state.selected===t.id&&state.selectedType==='text')?'#61a6ff':'#9d7cff';
+      ctx.lineWidth=2;
+      ctx.strokeRect(bx-4,by-4,mw+8,boxH+8);
+      ctx.restore();
+    }
   });
-  state.texts.forEach(t=>{
-    const anchor=t.align==='left'?'start':t.align==='right'?'end':'middle';
-    let tx=t.x*w;
-    parts.push(`<text x="${tx}" y="${t.y*h}" fill="${escXml(t.color)}" font-family="${escXml(t.font||'Arial, sans-serif')}" font-size="${t.size}" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">${escXml(t.text)}</text>`);
-  });
-  parts.push('</svg>');
-  return parts.join('');
-}
-$('downloadArtworkPdf').onclick=()=>{
-  const svg=artworkSvg();
-  const win=window.open('','_blank');
-  if(!win){toast('Sta pop-ups toe voor Artwork PDF');return;}
-  win.document.write(`<!doctype html><html><head><title>Artwork ${state.flap.w}x${state.flap.h} cm</title>
-  <style>
-    @page{size:${state.flap.w}cm ${state.flap.h}cm;margin:0}
-    html,body{margin:0;padding:0;width:100%;height:100%}
-    body{display:flex;align-items:center;justify-content:center;background:#d7dbe1}
-    .sheet{width:${state.flap.w}cm;height:${state.flap.h}cm}
-    @media print{body{background:transparent}.sheet{width:${state.flap.w}cm;height:${state.flap.h}cm}}
-  </style></head><body><div class="sheet">${svg}</div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),250);<\/script></body></html>`);
-  win.document.close();
-  toast('Artwork PDF geopend');
-};
 
+  ctx.restore();
+
+  // Dimension labels at their live positions.
+  const dimTop=$('dimTop');
+  if(dimTop){
+    const r=dimTop.getBoundingClientRect();
+    const st=getComputedStyle(dimTop);
+    ctx.font=`700 ${parseFloat(st.fontSize)||13}px Arial`;
+    ctx.fillStyle=st.color||'#222';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(dimTop.textContent,r.left-wrapRect.left+r.width/2,r.top-wrapRect.top+r.height/2);
+  }
+
+  const dimLeft=$('dimLeft');
+  if(dimLeft){
+    const r=dimLeft.getBoundingClientRect();
+    const st=getComputedStyle(dimLeft);
+    ctx.save();
+    ctx.translate(r.left-wrapRect.left+r.width/2,r.top-wrapRect.top+r.height/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font=`700 ${parseFloat(st.fontSize)||13}px Arial`;
+    ctx.fillStyle=st.color||'#222';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(dimLeft.textContent,0,0);
+    ctx.restore();
+  }
+
+  // Quantity badge at its live position.
+  const q=$('qtyBadge');
+  if(q && getComputedStyle(q).display!=='none'){
+    const r=q.getBoundingClientRect();
+    const st=getComputedStyle(q);
+    const x=r.left-wrapRect.left, y=r.top-wrapRect.top;
+
+    ctx.fillStyle=st.backgroundColor||'#fff';
+    ctx.strokeStyle=st.borderColor||'#cbd2da';
+    ctx.lineWidth=1;
+    roundRectPath(ctx,x,y,r.width,r.height,8,8,8,8);
+    ctx.fill();ctx.stroke();
+
+    ctx.fillStyle=st.color||'#222';
+    ctx.font=`700 ${parseFloat(st.fontSize)||12}px Arial`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(q.textContent,x+r.width/2,y+r.height/2);
+  }
+
+  const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
+
+  // Download always.
+  if(blob){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.download=`preview-screenshot-${state.flap.w}x${state.flap.h}cm.png`;
+    a.href=url;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }
+
+  // Also copy the exact same PNG to the clipboard when the browser allows it.
+  let copied=false;
+  try{
+    if(blob && navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([
+        new ClipboardItem({'image/png':blob})
+      ]);
+      copied=true;
+    }
+  }catch(e){
+    copied=false;
+  }
+
+  if(typeof toast==='function'){
+    toast(copied
+      ? 'Preview gedownload én naar klembord gekopieerd'
+      : 'Preview gedownload · klembord niet beschikbaar in deze browser');
+  }
+}
 $('download').onclick=exportPNG;
 
 function encodeShareState(){
@@ -1538,7 +2038,7 @@ function loadFromHash(){
   if(!location.hash.startsWith('#design='))return false;
   try{
     const x=decodeShareState(location.hash.slice(8));
-    if(x.f&&x.h){state.flap=x.f;if(state.flap.shape==='tapered')state.flap.shape='shoulder';if(state.flap.shoulderInset==null)state.flap.shoulderInset=5;if(state.flap.shoulderTopH==null)state.flap.shoulderTopH=5;state.holes=x.h;state.logos=x.l||[];state.logos.forEach(l=>{if(!l.ratio||!isFinite(l.ratio)||l.ratio<=0)l.ratio=(l.w/l.h)||1;});state.texts=x.t||[];state.ui=x.u||{wideMode:false,zones:true,zoneSide:15};if(state.ui.wideMode==null)state.ui.wideMode=false;if(state.ui.zoneSide==null)state.ui.zoneSide=15;state.selected=null;state.selectedType=null;syncUIFromState();render();return true;}
+    if(x.f&&x.h){state.flap=x.f;if(state.flap.shape==='tapered')state.flap.shape='shoulder';if(state.flap.shoulderInset==null)state.flap.shoulderInset=5;if(state.flap.shoulderTopH==null)state.flap.shoulderTopH=5;state.holes=x.h;state.logos=x.l||[];state.logos.forEach(l=>{if(!l.ratio||!isFinite(l.ratio)||l.ratio<=0)l.ratio=(l.w/l.h)||1;});state.texts=x.t||[];state.ui=x.u||{wideMode:false,zones:true,zoneSide:15};if(state.ui.wideMode==null)state.ui.wideMode=false;if(state.ui.zoneSide==null)state.ui.zoneSide=15;state.selected=null;state.selectedType=null;clearMultiSelection();syncUIFromState();render();return true;}
   }catch(e){}
   return false;
 }
