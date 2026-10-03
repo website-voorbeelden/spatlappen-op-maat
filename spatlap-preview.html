@@ -1871,6 +1871,136 @@ async function exportPNG(){
       : 'Preview gedownload · klembord niet beschikbaar in deze browser');
   }
 }
+
+async function buildArtworkCanvas(scale=14){
+  if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
+  const W=Math.max(1,Math.round(state.flap.w*scale));
+  const H=Math.max(1,Math.round(state.flap.h*scale));
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  const ctx=c.getContext('2d');
+
+  for(const x of state.logos){
+    await new Promise(resolve=>{
+      const img=new Image();
+      img.onload=()=>{
+        ctx.drawImage(img,x.x*W-x.w*scale/2,x.y*H-x.h*scale/2,x.w*scale,x.h*scale);
+        resolve();
+      };
+      img.onerror=resolve;
+      img.src=x.src;
+    });
+  }
+
+  state.texts.forEach(t=>{
+    const fs=t.size*scale;
+    ctx.font=`700 ${fs}px ${t.font||'Arial, sans-serif'}`;
+    ctx.fillStyle=t.color;
+    ctx.textBaseline='middle';
+    ctx.textAlign=t.align||'center';
+    let tx=t.x*W;
+    if(t.align==='left') tx-=ctx.measureText(t.text).width/2;
+    if(t.align==='right') tx+=ctx.measureText(t.text).width/2;
+    ctx.fillText(t.text,tx,t.y*H);
+  });
+  return c;
+}
+
+$('downloadArtworkPng').onclick=async()=>{
+  try{
+    const c=await buildArtworkCanvas();
+    const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
+    if(!blob) throw new Error('No PNG blob');
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.download=`artwork-${state.flap.w}x${state.flap.h}cm.png`;
+    a.href=url;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    toast('Artwork PNG gemaakt');
+  }catch(err){
+    console.error(err);
+    toast('Artwork PNG maken lukte niet');
+  }
+};
+
+function escapeXml(v){
+  return String(v).replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'
+  }[ch]));
+}
+
+function artworkSvgMarkup(){
+  const w=state.flap.w,h=state.flap.h;
+  const parts=[`<svg xmlns="http://www.w3.org/2000/svg" width="${w}cm" height="${h}cm" viewBox="0 0 ${w} ${h}">`];
+
+  state.logos.forEach(x=>{
+    parts.push(`<image href="${x.src}" x="${x.x*w-x.w/2}" y="${x.y*h-x.h/2}" width="${x.w}" height="${x.h}" preserveAspectRatio="none"/>`);
+  });
+
+  state.texts.forEach(t=>{
+    const anchor=t.align==='left'?'start':t.align==='right'?'end':'middle';
+    parts.push(`<text x="${t.x*w}" y="${t.y*h}" fill="${escapeXml(t.color)}" font-family="${escapeXml(t.font||'Arial, sans-serif')}" font-size="${t.size}" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">${escapeXml(t.text)}</text>`);
+  });
+
+  parts.push('</svg>');
+  return parts.join('');
+}
+
+$('downloadArtworkPdf').onclick=async()=>{
+  try{
+    if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
+    const popup=window.open('','_blank');
+    if(!popup){
+      toast('Sta pop-ups toe om Artwork PDF te openen');
+      return;
+    }
+
+    const w=state.flap.w,h=state.flap.h;
+    const svg=artworkSvgMarkup();
+
+    popup.document.open();
+    popup.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Artwork ${w}×${h} cm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Oswald:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Russo+One&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+@page{size:${w}cm ${h}cm;margin:0}
+html,body{margin:0;padding:0;background:#d9dde3;font-family:Arial,sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;box-sizing:border-box;min-height:100vh}
+.info{font-size:13px;color:#26313d}
+.sheet{width:${w}cm;height:${h}cm;overflow:hidden;background:transparent;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.sheet svg{display:block;width:100%;height:100%}
+@media print{
+  html,body{width:${w}cm;height:${h}cm;background:transparent}
+  body{display:block;padding:0;min-height:0}
+  .info{display:none}
+  .sheet{width:${w}cm;height:${h}cm;box-shadow:none;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="info">Artwork ${w} × ${h} cm · kies “Bewaar als PDF” / “Save as PDF”</div>
+<div class="sheet">${svg}</div>
+<script>
+(async()=>{
+  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;}catch(e){}
+  setTimeout(()=>window.print(),350);
+})();
+<\/script>
+</body>
+</html>`);
+    popup.document.close();
+    toast('Artwork PDF geopend');
+  }catch(err){
+    console.error(err);
+    toast('Artwork PDF openen lukte niet');
+  }
+};
+
 $('download').onclick=exportPNG;
 
 function encodeShareState(){
