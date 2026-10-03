@@ -719,10 +719,16 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <strong>Live voorvertoning</strong>
           <div class="hint">Klik op een logo/tekst om het te selecteren. Sleep om te verplaatsen.</div>
         </div>
-        <div class="toolbar-actions">
-          <button id="downloadArtworkPng">Artwork PNG</button>
-          <button id="downloadArtworkPdf">Artwork PDF</button>
-          <button id="download" class="primary" title="Downloadt de preview en probeert hem ook naar het klembord te kopiëren">Preview PNG</button>
+        <div>
+          <div class="toolbar-actions">
+            <button id="downloadArtworkPng">Artwork PNG</button>
+            <button id="downloadArtworkPdf">Artwork PDF</button>
+            <button id="download" class="primary" title="Downloadt de preview en probeert hem ook naar het klembord te kopiëren">Preview PNG</button>
+          </div>
+          <a id="pdfDownloadLink" href="#" download
+             style="display:none;margin-top:8px;font-size:12px;font-weight:700;color:#8fc0ff;text-decoration:none">
+            PDF klaar — klik hier om te downloaden
+          </a>
         </div>
       </div>
       <div class="preview-wrap" id="previewWrap">
@@ -1946,58 +1952,107 @@ function artworkSvgMarkup(){
   return parts.join('');
 }
 
-$('downloadArtworkPdf').onclick=async()=>{
-  try{
-    if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
-    const popup=window.open('','_blank');
-    if(!popup){
-      toast('Sta pop-ups toe om Artwork PDF te openen');
+function loadJsPdf(){
+  if(window.jspdf?.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+
+  return new Promise((resolve,reject)=>{
+    const existing=document.querySelector('script[data-jspdf-loader]');
+    if(existing){
+      if(window.jspdf?.jsPDF){
+        resolve(window.jspdf.jsPDF);
+        return;
+      }
+      existing.addEventListener('load',()=>resolve(window.jspdf?.jsPDF),{once:true});
+      existing.addEventListener('error',()=>reject(new Error('jsPDF laden mislukt')),{once:true});
       return;
     }
 
-    const w=state.flap.w,h=state.flap.h;
-    const svg=artworkSvgMarkup();
-
-    popup.document.open();
-    popup.document.write(`<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Artwork ${w}×${h} cm</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Oswald:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Russo+One&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
-@page{size:${w}cm ${h}cm;margin:0}
-html,body{margin:0;padding:0;background:#d9dde3;font-family:Arial,sans-serif}
-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;box-sizing:border-box;min-height:100vh}
-.info{font-size:13px;color:#26313d}
-.sheet{width:${w}cm;height:${h}cm;overflow:hidden;background:transparent;box-shadow:0 8px 30px rgba(0,0,0,.18)}
-.sheet svg{display:block;width:100%;height:100%}
-@media print{
-  html,body{width:${w}cm;height:${h}cm;background:transparent}
-  body{display:block;padding:0;min-height:0}
-  .info{display:none}
-  .sheet{width:${w}cm;height:${h}cm;box-shadow:none;margin:0}
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.async=true;
+    script.dataset.jspdfLoader='1';
+    script.onload=()=>{
+      if(window.jspdf?.jsPDF) resolve(window.jspdf.jsPDF);
+      else reject(new Error('jsPDF niet beschikbaar'));
+    };
+    script.onerror=()=>reject(new Error('jsPDF laden mislukt'));
+    document.head.appendChild(script);
+  });
 }
-</style>
-</head>
-<body>
-<div class="info">Artwork ${w} × ${h} cm · kies “Bewaar als PDF” / “Save as PDF”</div>
-<div class="sheet">${svg}</div>
-<script>
-(async()=>{
-  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;}catch(e){}
-  setTimeout(()=>window.print(),350);
-})();
-<\/script>
-</body>
-</html>`);
-    popup.document.close();
-    toast('Artwork PDF geopend');
+
+let currentPdfBlobUrl=null;
+
+$('downloadArtworkPdf').onclick=async()=>{
+  const btn=$('downloadArtworkPdf');
+  const link=$('pdfDownloadLink');
+  const oldLabel=btn.textContent;
+
+  try{
+    btn.disabled=true;
+    btn.textContent='PDF maken...';
+
+    const jsPDF=await loadJsPdf();
+    if(!jsPDF) throw new Error('jsPDF niet geladen');
+
+    const canvas=await buildArtworkCanvas(14);
+    const png=canvas.toDataURL('image/png');
+
+    const widthMm=Number(state.flap.w)*10;
+    const heightMm=Number(state.flap.h)*10;
+    const orientation=widthMm>=heightMm?'landscape':'portrait';
+
+    const pdf=new jsPDF({
+      orientation,
+      unit:'mm',
+      format:[widthMm,heightMm],
+      compress:true,
+      putOnlyUsedFonts:true
+    });
+
+    pdf.addImage(
+      png,
+      'PNG',
+      0,
+      0,
+      widthMm,
+      heightMm,
+      undefined,
+      'FAST'
+    );
+
+    // Build a real PDF Blob instead of relying only on jsPDF.save().
+    const blob=pdf.output('blob');
+
+    if(currentPdfBlobUrl){
+      try{URL.revokeObjectURL(currentPdfBlobUrl);}catch(e){}
+    }
+    currentPdfBlobUrl=URL.createObjectURL(blob);
+
+    const filename=`artwork-${state.flap.w}x${state.flap.h}cm.pdf`;
+    link.href=currentPdfBlobUrl;
+    link.download=filename;
+    link.textContent=`PDF klaar — download ${filename}`;
+    link.style.display='inline-block';
+
+    // Try automatic download once, but keep the visible link as fallback.
+    try{
+      const a=document.createElement('a');
+      a.href=currentPdfBlobUrl;
+      a.download=filename;
+      a.style.display='none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }catch(e){}
+
+    toast('PDF gemaakt · gebruik de downloadlink als hij niet automatisch verschijnt');
   }catch(err){
     console.error(err);
-    toast('Artwork PDF openen lukte niet');
+    link.style.display='none';
+    toast('PDF maken lukte niet');
+  }finally{
+    btn.disabled=false;
+    btn.textContent=oldLabel;
   }
 };
 
