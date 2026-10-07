@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://spatlappenopmaat.nl/</loc>
-    <lastmod>2026-09-03</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <image:image>
       <image:loc>https://spatlappenopmaat.nl/spatlap-met-logo-hero.webp</image:loc>
     </image:image>
@@ -25,6 +25,10 @@
   </url>
   <url>
     <loc>https://spatlappenopmaat.nl/bedrijfsgegevens.html</loc>
-    <lastmod>2026-09-03</lastmod>
+    <lastmod>2026-10-07</lastmod>
+  </url>
+  <url>
+    <loc>https://spatlappenopmaat.nl/algemene-voorwaarden.html</loc>
+    <lastmod>2026-10-07</lastmod>
   </url>
 </urlset>
