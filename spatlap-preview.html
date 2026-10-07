@@ -15,11 +15,19 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;max-width:100%;overflow-x:hidden}body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.app{display:grid;grid-template-columns:360px minmax(0,1fr);min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden}
-.sidebar{padding:16px;border-right:1px solid var(--line);background:#11141a;overflow:auto;max-height:100vh}
-.main{padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0;max-width:100%}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-.topbar h1{font-size:18px;margin:0}
+.app{display:grid;grid-template-columns:360px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100vh;height:100dvh;min-height:0;width:100%;max-width:100vw;overflow:hidden}
+.app-header{grid-column:1/-1;grid-row:1;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:58px;padding:8px 16px;background:#111720;border-bottom:1px solid #303a47;z-index:100}
+.header-brand{margin:0;font-size:17px;white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:7px;min-width:0}
+.header-actions button,.download-menu>summary{min-height:38px}
+.download-menu{position:relative}
+.download-menu>summary{display:flex;align-items:center;justify-content:center;list-style:none;border:1px solid #37404b;background:#20262f;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:700}
+.download-menu>summary::-webkit-details-marker{display:none}
+.download-menu[open]>summary{background:#29313c}
+.download-popover{position:absolute;right:0;top:calc(100% + 8px);width:min(270px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;padding:10px;background:#171d26;border:1px solid #3a4656;border-radius:10px;box-shadow:0 16px 35px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:7px;z-index:110}
+.download-popover button{text-align:left}
+.sidebar{grid-column:1;grid-row:2;padding:16px;border-right:1px solid var(--line);background:#11141a;overflow:auto;min-height:0}
+.main{grid-column:2;grid-row:2;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0;max-width:100%;min-height:0;overflow:auto}
 .iconbtn{width:38px;height:38px;padding:0;border-radius:9px;font-size:20px}
 .section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:11px}
 .section h2{font-size:14px;margin:0 0 11px}
@@ -81,10 +89,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .dim.top{top:-36px;left:50%;transform:translateX(-50%)}
 .dim.left{left:-49px;top:50%;transform:translateY(-50%) rotate(-90deg)}
 .qty{
-  position:absolute;right:0;top:auto;bottom:-44px;color:#222;background:white;border:1px solid #cbd2da;
+  color:#222;background:white;border:1px solid #cbd2da;
   border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;display:none;
-  white-space:nowrap
+  white-space:nowrap;margin-left:auto
 }
+.preview-badges{position:absolute;left:0;right:0;top:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;pointer-events:none}
+.color-badge{color:#222;background:white;border:1px solid #cbd2da;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;display:none;white-space:nowrap}
+.top-guide{position:absolute;left:0;right:0;top:0;z-index:8;pointer-events:none;background:repeating-linear-gradient(135deg,rgba(255,169,64,.16) 0 8px,rgba(255,169,64,.06) 8px 16px);border-bottom:2px dashed #ffb14f}
 .hint{color:var(--muted);font-size:12px;line-height:1.45}
 .tiny{font-size:11px;color:var(--muted);margin-top:6px}
 .list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
@@ -146,6 +157,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
 .preview-wrap.white-flap-bg .qty{
   color:#f4f7fb;background:#252a31;border-color:#59616d
 }
+.preview-wrap.white-flap-bg .color-badge{color:#f4f7fb;background:#252a31;border-color:#59616d}
 .preview-wrap.white-flap-bg .hint{color:#d8dee7}
 
 
@@ -240,6 +252,13 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
 .modal-card h3{margin:0 0 7px;font-size:16px}
 .modal-card p{margin:0 0 15px;color:#aeb8c5;font-size:12px;line-height:1.45}
 .modal-actions{display:flex;justify-content:flex-end;gap:8px}
+.pdf-viewer-card{width:min(1120px,100%);height:min(850px,92vh);display:flex;flex-direction:column;background:#171a20;border:1px solid #3a4656;border-radius:12px;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.45)}
+.pdf-viewer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px;border-bottom:1px solid #3a4656}
+.pdf-viewer-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pdf-viewer-actions a{display:inline-flex;align-items:center;border:1px solid #37404b;background:#20262f;color:#fff;border-radius:8px;padding:8px 10px;text-decoration:none;font-size:12px;font-weight:600}
+.pdf-viewer-actions button{font-size:12px;padding:8px 10px}
+.pdf-viewer-card iframe{flex:1;width:100%;min-height:0;border:0;background:white}
+@media(max-width:700px){.pdf-viewer-card{height:95vh}.pdf-viewer-head strong{width:100%}#pdfViewer{padding:5px}}
 .list-actions{display:flex;gap:5px;align-items:center}
 .list-item .trash{
   padding:4px 7px;
@@ -247,8 +266,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
   color:#ffbcbc;
   border-color:#5c3030;
 }
-.topbar-nav{display:flex;gap:6px}
-.topbar .iconbtn{font-size:18px}
+.header-actions .iconbtn{font-size:18px}
 .wide-layout-note{
   margin-top:8px;padding:8px 9px;border-radius:8px;background:#101a29;
   border:1px solid #263f61;color:#bcd7fa;font-size:11px
@@ -374,23 +392,64 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
 }
 
 @media(max-width:950px){
-  .app{grid-template-columns:1fr}.sidebar{max-height:none;border-right:none;border-bottom:1px solid var(--line)}
+  .app{display:flex;flex-direction:column;height:auto;min-height:100dvh;overflow:visible}
+  .app-header{position:sticky;top:0;flex:0 0 auto}
+  .sidebar{order:1;max-height:none;overflow:visible;border-right:none;border-bottom:1px solid var(--line)}
+  .main{order:2;overflow:visible}
   .preview-wrap{padding:65px 35px}
+}
+@media(max-width:700px){
+  :root{--mobile-header-h:56px;--mobile-preview-h:clamp(145px,24vh,220px)}
+  html{scroll-padding-top:calc(var(--mobile-header-h) + var(--mobile-preview-h) + 12px)}
+  .app-header{height:var(--mobile-header-h);min-height:var(--mobile-header-h);padding:6px 8px}
+  .header-brand{display:none}
+  .header-actions{width:100%;justify-content:space-between;gap:4px}
+  .header-actions .iconbtn{width:34px;height:36px;min-height:36px}
+  .header-actions button,.download-menu>summary{padding:7px 8px;font-size:12px;min-height:36px}
+  .main{order:1;padding:0 8px 4px}
+  .sidebar{order:2;padding:10px 8px 16px}
+  .canvas-card{min-height:0;padding:calc(var(--mobile-preview-h) + 12px) 9px 12px}
+  .preview-wrap{position:fixed;top:var(--mobile-header-h);left:0;right:0;width:100%;height:var(--mobile-preview-h);min-height:0;padding:20px 34px 30px;border-radius:0;border-bottom:2px solid #354355;z-index:90;box-shadow:0 8px 22px rgba(0,0,0,.32)}
+  .toolbar{margin-bottom:10px}
+  .toolbar .hint{font-size:11px}
+  .dim{font-size:11px}
+  .dim.top{top:-26px}
+  .dim.left{left:-41px}
+  .preview-badges{margin-top:5px}
+  .qty,.color-badge{font-size:10px;padding:4px 6px}
+}
+@media(max-width:700px) and (max-height:550px){:root{--mobile-preview-h:120px}}
+@media(max-width:360px){
+  .download-menu>summary{width:36px;font-size:0}
+  .download-menu>summary::after{content:"↓";font-size:18px}
 }
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
-    <div class="topbar">
-      <div class="topbar-nav">
-        <button id="undo" class="iconbtn" title="Ongedaan maken" disabled>←</button>
-        <button id="redo" class="iconbtn" title="Opnieuw uitvoeren" disabled>→</button>
-      </div>
-      <h1>Spatlap Preview</h1>
-      <button id="reset" class="iconbtn" title="Opnieuw beginnen">↻</button>
+  <header class="app-header">
+    <h1 class="header-brand">Spatlap Preview</h1>
+    <div class="header-actions">
+      <button id="undo" class="iconbtn" title="Ongedaan maken" aria-label="Ongedaan maken" disabled>↶</button>
+      <button id="redo" class="iconbtn" title="Opnieuw uitvoeren" aria-label="Opnieuw uitvoeren" disabled>↷</button>
+      <button id="headerSave" class="primary" type="button">Bewaar</button>
+      <details class="download-menu" id="downloadMenu"><summary>Download ▾</summary><div class="download-popover">
+        <button id="viewBlackPdf" class="primary" type="button">Bekijk PDF met zwarte achtergrond</button>
+        <button id="downloadBlackPdf" type="button">Download PDF met zwarte achtergrond</button>
+        <button id="copyBlackArtwork" type="button">Kopieer afbeelding met zwarte achtergrond</button>
+        <div class="field-help">De zwarte PDF is bedoeld om te bekijken en delen. Gebruik de Vector-PDF voor vector-artwork.</div>
+        <button id="downloadArtworkPdf" type="button">Artwork PDF zonder achtergrond</button>
+        <button id="downloadVectorPdf" type="button">Vector-PDF + kleuren</button>
+        <button id="download" class="primary" type="button" title="Downloadt de preview en probeert hem ook naar het klembord te kopiëren">Preview PNG</button>
+        <a id="pdfViewLink" href="#" target="_blank" rel="noopener" style="display:none;font-size:12px;font-weight:700;color:#8fc0ff;text-decoration:none">PDF klaar — klik om te bekijken</a>
+        <a id="pdfDownloadLink" href="#" download style="display:none;font-size:12px;font-weight:700;color:#8fc0ff;text-decoration:none">PDF klaar — klik hier om te downloaden</a>
+        <a id="imageFallbackLink" href="#" download style="display:none;font-size:12px;font-weight:700;color:#8fc0ff;text-decoration:none">Kopiëren niet beschikbaar — download de afbeelding</a>
+      </div></details>
+      <button id="headerLink" class="iconbtn" type="button" title="Korte lokale link kopiëren" aria-label="Korte lokale link kopiëren">🔗</button>
+      <button id="reset" class="iconbtn" title="Opnieuw beginnen" aria-label="Opnieuw beginnen">↻</button>
     </div>
-
+  </header>
+  <aside class="sidebar">
     <button id="copyAiPrompt" class="ai-hero"><span>✦ AI — maak configuratie uit beschrijving</span></button>
     <div id="aiStatus" class="ai-status"></div>
 
@@ -485,15 +544,17 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
       <summary><span class="section-num">3</span> Logo's</summary>
       <div class="section-body">
         <label>Logo toevoegen</label>
-        <input id="file" type="file" accept="image/png,image/jpeg,image/svg+xml" multiple>
-        <div class="field-help">Gebruik bij voorkeur een transparante PNG of SVG. Meerdere logo's zijn mogelijk.</div>
+        <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" multiple>
+        <div class="mini-actions" style="margin-top:9px"><button id="pasteLogo" type="button">Afbeelding plakken</button></div>
+        <div id="pasteLogoStatus" class="field-help">Je kunt ook een afbeelding kopiëren en hier op Ctrl/⌘+V drukken. SVG blijft vector; PNG en JPG kun je onder de preview naar een gekozen aantal kleuren omzetten.</div>
         <div id="logoList" class="list"></div>
 
         <details id="logoControls" class="subdetails" open style="display:none">
           <summary>Geselecteerd logo aanpassen</summary>
           <div class="subdetails-body">
             <div class="selected-note">Je kunt het logo ook direct in de preview verslepen.</div>
-
+            <label style="display:flex;align-items:center;gap:8px;margin:9px 0"><input id="selectedLogoVectorCheck" type="checkbox" disabled style="width:auto"><span id="selectedLogoVectorLabel">Vectorbestand</span></label>
+            <div class="field-help">Dit vinkje wordt automatisch gezet voor een SVG of na omzetting. Het is geen handmatige instelling.</div>
             <details class="subdetails" open>
               <summary>Formaat</summary>
               <div class="subdetails-body">
@@ -529,7 +590,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
                   <button id="alignLogoRight">Rechts</button>
                 </div>
 
-                <label>Verticaal uitlijnen</label>
+                <label>Verticaal uitlijnen (onder de bovenstrook als die aan staat)</label>
                 <div class="align-grid">
                   <button id="alignLogoTop">Boven</button>
                   <button id="alignLogoMiddle">Midden</button>
@@ -660,6 +721,12 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <button id="centerText">Centreren</button>
               <button id="deleteText" class="danger">Verwijderen</button>
             </div>
+            <label style="margin-top:10px">Tekst verticaal uitlijnen</label>
+            <div class="align-grid">
+              <button id="alignTextTop">Boven</button>
+              <button id="alignTextMiddle">Midden</button>
+              <button id="alignTextBottom">Onder</button>
+            </div>
           </div>
         </details>
       </div>
@@ -709,7 +776,6 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
       </div>
     </details>
 
-
   </aside>
 
   <main class="main">
@@ -719,23 +785,13 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <strong>Live voorvertoning</strong>
           <div class="hint">Klik op een logo/tekst om het te selecteren. Sleep om te verplaatsen.</div>
         </div>
-        <div>
-          <div class="toolbar-actions">
-            <button id="downloadArtworkPng">Artwork PNG</button>
-            <button id="downloadArtworkPdf">Artwork PDF</button>
-            <button id="download" class="primary" title="Downloadt de preview en probeert hem ook naar het klembord te kopiëren">Preview PNG</button>
-          </div>
-          <a id="pdfDownloadLink" href="#" download
-             style="display:none;margin-top:8px;font-size:12px;font-weight:700;color:#8fc0ff;text-decoration:none">
-            PDF klaar — klik hier om te downloaden
-          </a>
-        </div>
+        <button id="quickBlackPdf" type="button">Bekijk zwarte PDF</button>
       </div>
       <div class="preview-wrap" id="previewWrap">
         <div id="stage">
           <div class="dim top" id="dimTop">190 cm</div>
           <div class="dim left" id="dimLeft">25 cm</div>
-          <div class="qty" id="qtyBadge"></div>
+          <div class="preview-badges"><div class="color-badge" id="colorBadge"></div><div class="qty" id="qtyBadge"></div></div>
           <div id="flap"></div>
         </div>
       </div>
@@ -747,16 +803,67 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
         <button id="deleteSelected" class="danger">Verwijderen</button>
       </div>
 
+      <details class="subdetails" id="colorTools" open>
+        <summary>Kleuren & vector</summary>
+        <div class="subdetails-body">
+          <div class="subcard">
+            <div class="subcard-title">Drukkleuren van de hele spatlap</div>
+            <div id="colorCountStatus" class="field-help">De spatlapkleur telt niet mee. Bij een onbekend logo kun je het aantal zelf invullen.</div>
+            <label class="check"><input id="showColorCount" type="checkbox"> Aantal drukkleuren tonen in de preview</label>
+            <label style="margin-top:9px">Aantal voor klant (leeg = automatisch)</label>
+            <input id="manualColorCount" type="number" min="1" max="99" placeholder="Automatisch">
+          </div>
+          <div class="subcard">
+            <div class="subcard-title">Geselecteerde afbeelding naar vector omzetten</div>
+            <div id="vectorTarget" class="field-help">Selecteer een PNG, JPG of WebP in de preview. Deze omzetting geldt voor die afbeelding; de drukkleuren hierboven gelden voor het hele ontwerp.</div>
+            <div class="row" style="margin-top:9px">
+              <div><label>Max. kleuren in deze afbeelding</label><input id="vectorColorCount" type="number" min="1" max="8" value="1"></div>
+              <div><label>Kleur bij 1 kleur</label><input id="vectorSingleColor" type="color" value="#ffffff"></div>
+            </div>
+            <label>Randen</label>
+            <select id="vectorEdgeStyle">
+              <option value="smooth">Vloeiend</option>
+              <option value="sharp">Strak</option>
+              <option value="detail">Meer detail</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:8px;margin:9px 0"><input id="vectorWhiteCutout" type="checkbox" checked style="width:auto"> Lichte delen behouden, donkere achtergrond weglaten</label>
+            <div class="field-help">Bij een transparante PNG gebruikt de tool de transparantie. Bij een afbeelding zonder transparantie kun je hiermee de donkere achtergrond weglaten, ook bij meer kleuren.</div>
+            <details class="subdetails"><summary>Fijn afstellen</summary><div class="subdetails-body">
+              <div class="row">
+                <div><label>Lichtgrens (0–255)</label><input id="vectorLightThreshold" type="number" min="0" max="255" value="170"></div>
+                <div><label>Transparantiegrens (0–255)</label><input id="vectorAlphaThreshold" type="number" min="1" max="255" value="64"></div>
+              </div>
+              <div class="field-help">Verlaag de lichtgrens als dunne witte lijnen verdwijnen. Verlaag de transparantiegrens als zachte randen ontbreken; verhoog hem als er te veel ruis verschijnt.</div>
+            </div></details>
+            <div class="mini-actions" style="margin-top:9px"><button id="vectorizeLogo" type="button">Zet afbeelding om naar vector</button><button id="restoreRasterLogo" type="button" disabled>Origineel herstellen</button></div>
+            <div id="vectorStatus" class="field-help">Voor een wit logo kies je 1 kleur. Controleer het resultaat in de preview.</div>
+          </div>
+          <div class="subcard">
+            <div class="subcard-title">Klantpreview</div>
+            <label class="check"><input id="topGuideOn" type="checkbox"> Bovenstrook van 3 cm tonen</label>
+            <div class="field-help">Visuele hulplijn vanaf de bovenrand. De strook verandert het drukbestand niet.</div>
+            <div id="topGuideStatus" class="field-help"></div>
+          </div>
+        </div>
+      </details>
+
       <div class="share-bar">
         <div class="share-bar-left">
-          <button id="copyUrl">🔗 Link kopiëren</button>
-          <button id="openCopy">↗ Kopie openen</button>
+          <input id="localDesignName" type="text" placeholder="Naam ontwerp" aria-label="Naam van lokaal ontwerp" style="width:165px;max-width:100%">
+          <button id="saveLocal" type="button">💾 Lokaal bewaren</button>
+          <button id="copyLocalUrl" type="button">🔗 Korte lokale link</button>
+          <button id="copyUrl" type="button">🌐 Deelbare link</button>
+          <button id="openCopy" type="button">↗ Deelbare kopie openen</button>
           <div id="shareStatus" class="status"></div>
         </div>
         <div class="share-bar-right">
           <span class="shortcut-hint">Pijltjes = verplaatsen · Shift+klik = meerdere selecteren · Ctrl/Cmd C/V/Z</span>
         </div>
       </div>
+      <details class="subdetails" style="margin-top:10px"><summary>Bewaarde ontwerpen op deze browser</summary><div class="subdetails-body">
+        <div class="field-help">Een korte lokale link werkt alleen in deze browser en bij ditzelfde bestand. Klik na wijzigingen opnieuw op bewaren. Browsergegevens wissen verwijdert deze ontwerpen. Gebruik de deelbare link voor een klant of ander apparaat. Bewaar lokaal als je de vectoromzetting later opnieuw wilt afstellen.</div>
+        <div id="savedDesigns" class="list" style="margin-top:10px"></div>
+      </div></details>
     </div>
   </main>
 </div>
@@ -767,7 +874,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
 <div id="resetModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="modal-card">
     <h3>Opnieuw beginnen?</h3>
-    <p>Alle huidige logo's, tekst en instellingen worden gewist. Je kunt dit daarna nog ongedaan maken met de pijl naar links.</p>
+    <p>Alle huidige logo's, tekst en instellingen worden gewist. Je kunt dit daarna nog ongedaan maken met de knop Ongedaan maken.</p>
     <div class="modal-actions">
       <button id="cancelReset">Annuleren</button>
       <button id="confirmReset" class="danger">Ja, opnieuw beginnen</button>
@@ -775,6 +882,1245 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
   </div>
 </div>
 
+<div id="pdfViewer" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="PDF met zwarte achtergrond bekijken">
+  <div class="pdf-viewer-card">
+    <div class="pdf-viewer-head">
+      <strong>PDF met zwarte achtergrond</strong>
+      <div class="pdf-viewer-actions">
+        <a id="pdfViewerOpenTab" href="#" target="_blank" rel="noopener">Nieuw tabblad</a>
+        <a id="pdfViewerDownload" href="#" download>Download PDF</a>
+        <button id="pdfViewerCopy" type="button">Kopieer afbeelding</button>
+        <a id="pdfViewerImageFallback" href="#" download style="display:none">Download afbeelding</a>
+        <button id="pdfViewerClose" type="button">Sluiten</button>
+      </div>
+    </div>
+    <iframe id="pdfViewerFrame" title="PDF met zwarte achtergrond"></iframe>
+  </div>
+</div>
+
+<script>
+/*
+	imagetracer.js version 1.2.6
+	Simple raster image tracer and vectorizer written in JavaScript.
+	andras@jankovics.net
+*/
+
+/*
+
+The Unlicense / PUBLIC DOMAIN
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to http://unlicense.org/
+
+*/
+
+(function(){ 'use strict';
+
+function ImageTracer(){
+	var _this = this;
+
+	this.versionnumber = '1.2.6',
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  API
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Loading an image from a URL, tracing when loaded,
+	// then executing callback with the scaled svg string as argument
+	this.imageToSVG = function( url, callback, options ){
+		options = _this.checkoptions(options);
+		// loading image, tracing and callback
+		_this.loadImage(
+			url,
+			function(canvas){
+				callback(
+					_this.imagedataToSVG( _this.getImgdata(canvas), options )
+				);
+			},
+			options
+		);
+	},// End of imageToSVG()
+	
+	// Tracing imagedata, then returning the scaled svg string
+	this.imagedataToSVG = function( imgd, options ){
+		options = _this.checkoptions(options);
+		// tracing imagedata
+		var td = _this.imagedataToTracedata( imgd, options );
+		// returning SVG string
+		return _this.getsvgstring(td, options);
+	},// End of imagedataToSVG()
+	
+	// Loading an image from a URL, tracing when loaded,
+	// then executing callback with tracedata as argument
+	this.imageToTracedata = function( url, callback, options ){
+		options = _this.checkoptions(options);
+		// loading image, tracing and callback
+		_this.loadImage(
+				url,
+				function(canvas){
+					callback(
+						_this.imagedataToTracedata( _this.getImgdata(canvas), options )
+					);
+				},
+				options
+		);
+	},// End of imageToTracedata()
+	
+	// Tracing imagedata, then returning tracedata (layers with paths, palette, image size)
+	this.imagedataToTracedata = function( imgd, options ){
+		options = _this.checkoptions(options);
+		
+		// 1. Color quantization
+		var ii = _this.colorquantization( imgd, options );
+		
+		if(options.layering === 0){// Sequential layering
+			
+			// create tracedata object
+			var tracedata = {
+				layers : [],
+				palette : ii.palette,
+				width : ii.array[0].length-2,
+				height : ii.array.length-2
+			};
+			
+			// Loop to trace each color layer
+			for(var colornum=0; colornum<ii.palette.length; colornum++){
+				
+				// layeringstep -> pathscan -> internodes -> batchtracepaths
+				var tracedlayer =
+					_this.batchtracepaths(
+							
+						_this.internodes(
+								
+							_this.pathscan(
+								_this.layeringstep( ii, colornum ),
+								options.pathomit
+							),
+							
+							options
+							
+						),
+						
+						options.ltres,
+						options.qtres
+						
+					);
+				
+				// adding traced layer
+				tracedata.layers.push(tracedlayer);
+				
+			}// End of color loop
+			
+		}else{// Parallel layering
+			// 2. Layer separation and edge detection
+			var ls = _this.layering( ii );
+			
+			// Optional edge node visualization
+			if(options.layercontainerid){ _this.drawLayers( ls, _this.specpalette, options.scale, options.layercontainerid ); }
+			
+			// 3. Batch pathscan
+			var bps = _this.batchpathscan( ls, options.pathomit );
+			
+			// 4. Batch interpollation
+			var bis = _this.batchinternodes( bps, options );
+			
+			// 5. Batch tracing and creating tracedata object
+			var tracedata = {
+				layers : _this.batchtracelayers( bis, options.ltres, options.qtres ),
+				palette : ii.palette,
+				width : imgd.width,
+				height : imgd.height
+			};
+			
+		}// End of parallel layering
+		
+		// return tracedata
+		return tracedata;
+		
+	},// End of imagedataToTracedata()
+	
+	this.optionpresets = {
+		'default': {
+			
+			// Tracing
+			corsenabled : false,
+			ltres : 1,
+			qtres : 1,
+			pathomit : 8,
+			rightangleenhance : true,
+			
+			// Color quantization
+			colorsampling : 2,
+			numberofcolors : 16,
+			mincolorratio : 0,
+			colorquantcycles : 3,
+			
+			// Layering method
+			layering : 0,
+			
+			// SVG rendering
+			strokewidth : 1,
+			linefilter : false,
+			scale : 1,
+			roundcoords : 1,
+			viewbox : false,
+			desc : false,
+			lcpr : 0,
+			qcpr : 0,
+			
+			// Blur
+			blurradius : 0,
+			blurdelta : 20
+			
+		},
+		'posterized1': { colorsampling:0, numberofcolors:2 },
+		'posterized2': { numberofcolors:4, blurradius:5 },
+		'curvy': { ltres:0.01, linefilter:true, rightangleenhance:false },
+		'sharp': { qtres:0.01, linefilter:false },
+		'detailed': { pathomit:0, roundcoords:2, ltres:0.5, qtres:0.5, numberofcolors:64 },
+		'smoothed': { blurradius:5, blurdelta: 64 },
+		'grayscale': { colorsampling:0, colorquantcycles:1, numberofcolors:7 },
+		'fixedpalette': { colorsampling:0, colorquantcycles:1, numberofcolors:27 },
+		'randomsampling1': { colorsampling:1, numberofcolors:8 },
+		'randomsampling2': { colorsampling:1, numberofcolors:64 },
+		'artistic1': { colorsampling:0, colorquantcycles:1, pathomit:0, blurradius:5, blurdelta: 64, ltres:0.01, linefilter:true, numberofcolors:16, strokewidth:2 },
+		'artistic2': { qtres:0.01, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 },
+		'artistic3': { qtres:10, ltres:10, numberofcolors:8 },
+		'artistic4': { qtres:10, ltres:10, numberofcolors:64, blurradius:5, blurdelta: 256, strokewidth:2 },
+		'posterized3': { ltres: 1, qtres: 1, pathomit: 20, rightangleenhance: true, colorsampling: 0, numberofcolors: 3,
+			mincolorratio: 0, colorquantcycles: 3, blurradius: 3, blurdelta: 20, strokewidth: 0, linefilter: false,
+			roundcoords: 1, pal: [ { r: 0, g: 0, b: 100, a: 255 }, { r: 255, g: 255, b: 255, a: 255 } ] }
+	},// End of optionpresets
+	
+	// creating options object, setting defaults for missing values
+	this.checkoptions = function(options){
+		options = options || {};
+		// Option preset
+		if(typeof options === 'string'){
+			options = options.toLowerCase();
+			if( _this.optionpresets[options] ){ options = _this.optionpresets[options]; }else{ options = {}; }
+		}
+		// Defaults
+		var ok = Object.keys(_this.optionpresets['default']);
+		for(var k=0; k<ok.length; k++){
+			if(!options.hasOwnProperty(ok[k])){ options[ok[k]] = _this.optionpresets['default'][ok[k]]; }
+		}
+		// options.pal is not defined here, the custom palette should be added externally: options.pal = [ { 'r':0, 'g':0, 'b':0, 'a':255 }, {...}, ... ];
+		// options.layercontainerid is not defined here, can be added externally: options.layercontainerid = 'mydiv'; ... <div id="mydiv"></div>
+		return options;
+	},// End of checkoptions()
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  Vectorizing functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// 1. Color quantization
+	// Using a form of k-means clustering repeatead options.colorquantcycles times. http://en.wikipedia.org/wiki/Color_quantization
+	this.colorquantization = function( imgd, options ){
+		var arr = [], idx=0, cd,cdl,ci, paletteacc = [], pixelnum = imgd.width * imgd.height, i, j, k, cnt, palette;
+		
+		// imgd.data must be RGBA, not just RGB
+		if( imgd.data.length < pixelnum * 4 ){
+			var newimgddata = new Uint8ClampedArray(pixelnum * 4);
+			for(var pxcnt = 0; pxcnt < pixelnum ; pxcnt++){
+				newimgddata[pxcnt*4  ] = imgd.data[pxcnt*3  ];
+				newimgddata[pxcnt*4+1] = imgd.data[pxcnt*3+1];
+				newimgddata[pxcnt*4+2] = imgd.data[pxcnt*3+2];
+				newimgddata[pxcnt*4+3] = 255;
+			}
+			imgd.data = newimgddata;
+		}// End of RGBA imgd.data check
+		
+		// Filling arr (color index array) with -1
+		for( j=0; j<imgd.height+2; j++ ){ arr[j]=[]; for(i=0; i<imgd.width+2 ; i++){ arr[j][i] = -1; } }
+		
+		// Use custom palette if pal is defined or sample / generate custom length palette
+		if(options.pal){
+			palette = options.pal;
+		}else if(options.colorsampling === 0){
+			palette = _this.generatepalette(options.numberofcolors);
+		}else if(options.colorsampling === 1){
+			palette = _this.samplepalette( options.numberofcolors, imgd );
+		}else{
+			palette = _this.samplepalette2( options.numberofcolors, imgd );
+		}
+		
+		// Selective Gaussian blur preprocessing
+		if( options.blurradius > 0 ){ imgd = _this.blur( imgd, options.blurradius, options.blurdelta ); }
+		
+		// Repeat clustering step options.colorquantcycles times
+		for( cnt=0; cnt < options.colorquantcycles; cnt++ ){
+			
+			// Average colors from the second iteration
+			if(cnt>0){
+				// averaging paletteacc for palette
+				for( k=0; k < palette.length; k++ ){
+					
+					// averaging
+					if( paletteacc[k].n > 0 ){
+						palette[k] = {  r: Math.floor( paletteacc[k].r / paletteacc[k].n ),
+										g: Math.floor( paletteacc[k].g / paletteacc[k].n ),
+										b: Math.floor( paletteacc[k].b / paletteacc[k].n ),
+										a:  Math.floor( paletteacc[k].a / paletteacc[k].n ) };
+					}
+					
+					// Randomizing a color, if there are too few pixels and there will be a new cycle
+					if( ( paletteacc[k].n/pixelnum < options.mincolorratio ) && ( cnt < options.colorquantcycles-1 ) ){
+						palette[k] = {  r: Math.floor(Math.random()*255),
+										g: Math.floor(Math.random()*255),
+										b: Math.floor(Math.random()*255),
+										a: Math.floor(Math.random()*255) };
+					}
+					
+				}// End of palette loop
+			}// End of Average colors from the second iteration
+			
+			// Reseting palette accumulator for averaging
+			for( i=0; i < palette.length; i++ ){ paletteacc[i] = { r:0, g:0, b:0, a:0, n:0 }; }
+			
+			// loop through all pixels
+			for( j=0; j < imgd.height; j++ ){
+				for( i=0; i < imgd.width; i++ ){
+					
+					// pixel index
+					idx = (j*imgd.width+i)*4;
+					
+					// find closest color from palette by measuring (rectilinear) color distance between this pixel and all palette colors
+					ci=0; cdl = 1024; // 4 * 256 is the maximum RGBA distance
+					for( k=0; k<palette.length; k++ ){
+						
+						// In my experience, https://en.wikipedia.org/wiki/Rectilinear_distance works better than https://en.wikipedia.org/wiki/Euclidean_distance
+						cd = 
+							( palette[k].r > imgd.data[idx  ] ? palette[k].r - imgd.data[idx  ] : imgd.data[idx  ] - palette[k].r ) +
+							( palette[k].g > imgd.data[idx+1] ? palette[k].g - imgd.data[idx+1] : imgd.data[idx+1] - palette[k].g ) +
+							( palette[k].b > imgd.data[idx+2] ? palette[k].b - imgd.data[idx+2] : imgd.data[idx+2] - palette[k].b ) +
+							( palette[k].a > imgd.data[idx+3] ? palette[k].a - imgd.data[idx+3] : imgd.data[idx+3] - palette[k].a );
+						
+						// Remember this color if this is the closest yet
+						if(cd<cdl){ cdl = cd; ci = k; }
+						
+					}// End of palette loop
+					
+					// add to palettacc
+					paletteacc[ci].r += imgd.data[idx  ];
+					paletteacc[ci].g += imgd.data[idx+1];
+					paletteacc[ci].b += imgd.data[idx+2];
+					paletteacc[ci].a += imgd.data[idx+3];
+					paletteacc[ci].n++;
+					
+					// update the indexed color array
+					arr[j+1][i+1] = ci;
+					
+				}// End of i loop
+			}// End of j loop
+			
+		}// End of Repeat clustering step options.colorquantcycles times
+		
+		return { array:arr, palette:palette };
+		
+	},// End of colorquantization()
+	
+	// Sampling a palette from imagedata
+	this.samplepalette = function( numberofcolors, imgd ){
+		var idx, palette=[];
+		for(var i=0; i<numberofcolors; i++){
+			idx = Math.floor( Math.random() * imgd.data.length / 4 ) * 4;
+			palette.push({ r:imgd.data[idx  ], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] });
+		}
+		return palette;
+	},// End of samplepalette()
+	
+	// Deterministic sampling a palette from imagedata: rectangular grid
+	this.samplepalette2 = function( numberofcolors, imgd ){
+		var idx, palette=[], ni = Math.ceil(Math.sqrt(numberofcolors)), nj = Math.ceil(numberofcolors/ni),
+			vx = imgd.width / (ni+1), vy = imgd.height / (nj+1);
+		for(var j=0; j<nj; j++){
+			for(var i=0; i<ni; i++){
+				if(palette.length === numberofcolors){
+					break;
+				}else{
+					idx = Math.floor( ((j+1)*vy) * imgd.width + ((i+1)*vx) ) * 4;
+					palette.push( { r:imgd.data[idx], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] } );
+				}
+			}
+		}
+		return palette;
+	},// End of samplepalette2()
+	
+	// Generating a palette with numberofcolors
+	this.generatepalette = function(numberofcolors){
+		var palette = [], rcnt, gcnt, bcnt;
+		if(numberofcolors<8){
+			
+			// Grayscale
+			var graystep = Math.floor(255/(numberofcolors-1));
+			for(var i=0; i<numberofcolors; i++){ palette.push({ r:i*graystep, g:i*graystep, b:i*graystep, a:255 }); }
+			
+		}else{
+			
+			// RGB color cube
+			var colorqnum = Math.floor(Math.pow(numberofcolors, 1/3)), // Number of points on each edge on the RGB color cube
+				colorstep = Math.floor(255/(colorqnum-1)), // distance between points
+				rndnum = numberofcolors - colorqnum*colorqnum*colorqnum; // number of random colors
+			
+			for(rcnt=0; rcnt<colorqnum; rcnt++){
+				for(gcnt=0; gcnt<colorqnum; gcnt++){
+					for(bcnt=0; bcnt<colorqnum; bcnt++){
+						palette.push( { r:rcnt*colorstep, g:gcnt*colorstep, b:bcnt*colorstep, a:255 } );
+					}// End of blue loop
+				}// End of green loop
+			}// End of red loop
+			
+			// Rest is random
+			for(rcnt=0; rcnt<rndnum; rcnt++){ palette.push({ r:Math.floor(Math.random()*255), g:Math.floor(Math.random()*255), b:Math.floor(Math.random()*255), a:Math.floor(Math.random()*255) }); }
+
+		}// End of numberofcolors check
+		
+		return palette;
+	},// End of generatepalette()
+		
+	// 2. Layer separation and edge detection
+	// Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+	// 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+	// 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+	//     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+	this.layering = function(ii){
+		// Creating layers for each indexed color in arr
+		var layers = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+		
+		// Create layers
+		for(k=0; k<ii.palette.length; k++){
+			layers[k] = [];
+			for(j=0; j<ah; j++){
+				layers[k][j] = [];
+				for(i=0; i<aw; i++){
+					layers[k][j][i]=0;
+				}
+			}
+		}
+		
+		// Looping through all pixels and calculating edge node type
+		for(j=1; j<ah-1; j++){
+			for(i=1; i<aw-1; i++){
+				
+				// This pixel's indexed color
+				val = ii.array[j][i];
+				
+				// Are neighbor pixel colors the same?
+				n1 = ii.array[j-1][i-1]===val ? 1 : 0;
+				n2 = ii.array[j-1][i  ]===val ? 1 : 0;
+				n3 = ii.array[j-1][i+1]===val ? 1 : 0;
+				n4 = ii.array[j  ][i-1]===val ? 1 : 0;
+				n5 = ii.array[j  ][i+1]===val ? 1 : 0;
+				n6 = ii.array[j+1][i-1]===val ? 1 : 0;
+				n7 = ii.array[j+1][i  ]===val ? 1 : 0;
+				n8 = ii.array[j+1][i+1]===val ? 1 : 0;
+				
+				// this pixel's type and looking back on previous pixels
+				layers[val][j+1][i+1] = 1 + n5 * 2 + n8 * 4 + n7 * 8 ;
+				if(!n4){ layers[val][j+1][i  ] = 0 + 2 + n7 * 4 + n6 * 8 ; }
+				if(!n2){ layers[val][j  ][i+1] = 0 + n3*2 + n5 * 4 + 8 ; }
+				if(!n1){ layers[val][j  ][i  ] = 0 + n2*2 + 4 + n4 * 8 ; }
+				
+			}// End of i loop
+		}// End of j loop
+		
+		return layers;
+	},// End of layering()
+	
+	// 2. Layer separation and edge detection
+	// Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+	// 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+	// 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+	//     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+	this.layeringstep = function(ii,cnum){
+		// Creating layers for each indexed color in arr
+		var layer = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+		
+		// Create layer
+		for(j=0; j<ah; j++){
+			layer[j] = [];
+			for(i=0; i<aw; i++){
+				layer[j][i]=0;
+			}
+		}
+		
+		// Looping through all pixels and calculating edge node type
+		for(j=1; j<ah; j++){
+			for(i=1; i<aw; i++){
+				layer[j][i] =
+					( ii.array[j-1][i-1]===cnum ? 1 : 0 ) +
+					( ii.array[j-1][i]===cnum ? 2 : 0 ) +
+					( ii.array[j][i-1]===cnum ? 8 : 0 ) +
+					( ii.array[j][i]===cnum ? 4 : 0 )
+				;
+			}// End of i loop
+		}// End of j loop
+			
+		return layer;
+	},// End of layeringstep()
+	
+	// Point in polygon test
+	this.pointinpoly = function( p, pa ){
+		var isin=false;
+
+		for(var i=0,j=pa.length-1; i<pa.length; j=i++){
+			isin =
+				( ((pa[i].y > p.y) !== (pa[j].y > p.y)) && (p.x < (pa[j].x - pa[i].x) * (p.y - pa[i].y) / (pa[j].y - pa[i].y) + pa[i].x) )
+				? !isin : isin;
+		}
+
+		return isin;
+	},
+	
+	// Lookup tables for pathscan
+	// pathscan_combined_lookup[ arr[py][px] ][ dir ] = [nextarrpypx, nextdir, deltapx, deltapy];
+	this.pathscan_combined_lookup = [
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]],// arr[py][px]===0 is invalid
+		[[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+		[[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+		
+		[[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+		[[13, 3, 0, 1], [13, 2,-1, 0], [ 7, 1, 0,-1], [ 7, 0, 1, 0]],
+		[[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+		[[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+		
+		[[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+		[[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+		[[11, 1, 0,-1], [14, 0, 1, 0], [14, 3, 0, 1], [11, 2,-1, 0]],
+		[[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+		
+		[[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+		[[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]]// arr[py][px]===15 is invalid
+	],
+
+	// 3. Walking through an edge node array, discarding edge node types 0 and 15 and creating paths from the rest.
+	// Walk directions (dir): 0 > ; 1 ^ ; 2 < ; 3 v 
+	this.pathscan = function( arr, pathomit ){
+		var paths=[], pacnt=0, pcnt=0, px=0, py=0, w = arr[0].length, h = arr.length,
+			dir=0, pathfinished=true, holepath=false, lookuprow;
+		
+		for(var j=0; j<h; j++){
+			for(var i=0; i<w; i++){
+				if( (arr[j][i] == 4) || ( arr[j][i] == 11) ){ // Other values are not valid
+					
+					// Init
+					px = i; py = j;
+					paths[pacnt] = {};
+					paths[pacnt].points = [];
+					paths[pacnt].boundingbox = [px,py,px,py];
+					paths[pacnt].holechildren = [];
+					pathfinished = false;
+					pcnt=0;
+					holepath = (arr[j][i]==11);
+					dir = 1;
+
+					// Path points loop
+					while(!pathfinished){
+						
+						// New path point
+						paths[pacnt].points[pcnt] = {};
+						paths[pacnt].points[pcnt].x = px-1;
+						paths[pacnt].points[pcnt].y = py-1;
+						paths[pacnt].points[pcnt].t = arr[py][px];
+						
+						// Bounding box
+						if( (px-1) < paths[pacnt].boundingbox[0] ){ paths[pacnt].boundingbox[0] = px-1; }
+						if( (px-1) > paths[pacnt].boundingbox[2] ){ paths[pacnt].boundingbox[2] = px-1; }
+						if( (py-1) < paths[pacnt].boundingbox[1] ){ paths[pacnt].boundingbox[1] = py-1; }
+						if( (py-1) > paths[pacnt].boundingbox[3] ){ paths[pacnt].boundingbox[3] = py-1; }
+						
+						// Next: look up the replacement, direction and coordinate changes = clear this cell, turn if required, walk forward
+						lookuprow = _this.pathscan_combined_lookup[ arr[py][px] ][ dir ];
+						arr[py][px] = lookuprow[0]; dir = lookuprow[1]; px += lookuprow[2]; py += lookuprow[3];
+
+						// Close path
+						if( (px-1 === paths[pacnt].points[0].x ) && ( py-1 === paths[pacnt].points[0].y ) ){
+							pathfinished = true;
+							
+							// Discarding paths shorter than pathomit
+							if( paths[pacnt].points.length < pathomit ){
+								paths.pop();
+							}else{
+							
+								paths[pacnt].isholepath = holepath ? true : false;
+								
+								// Finding the parent shape for this hole
+								if(holepath){
+									
+									var parentidx = 0, parentbbox = [-1,-1,w+1,h+1];
+									for(var parentcnt=0; parentcnt < pacnt; parentcnt++){
+										if( (!paths[parentcnt].isholepath) &&
+											_this.boundingboxincludes( paths[parentcnt].boundingbox , paths[pacnt].boundingbox ) &&
+											_this.boundingboxincludes( parentbbox , paths[parentcnt].boundingbox ) &&
+											_this.pointinpoly( paths[pacnt].points[0], paths[parentcnt].points )
+										){
+											parentidx = parentcnt;
+											parentbbox = paths[parentcnt].boundingbox;
+										}
+									}
+									
+									paths[parentidx].holechildren.push( pacnt );
+									
+								}// End of holepath parent finding
+								
+								pacnt++;
+							
+							}
+							
+						}// End of Close path
+						
+						pcnt++;
+						
+					}// End of Path points loop
+					
+				}// End of Follow path
+				
+			}// End of i loop
+		}// End of j loop
+		
+		return paths;
+	},// End of pathscan()
+	
+	this.boundingboxincludes = function( parentbbox, childbbox ){
+		return ( ( parentbbox[0] < childbbox[0] ) && ( parentbbox[1] < childbbox[1] ) && ( parentbbox[2] > childbbox[2] ) && ( parentbbox[3] > childbbox[3] ) );
+	},// End of boundingboxincludes()
+	
+	// 3. Batch pathscan
+	this.batchpathscan = function( layers, pathomit ){
+		var bpaths = [];
+		for(var k in layers){
+			if(!layers.hasOwnProperty(k)){ continue; }
+			bpaths[k] = _this.pathscan( layers[k], pathomit );
+		}
+		return bpaths;
+	},
+	
+	// 4. interpollating between path points for nodes with 8 directions ( East, SouthEast, S, SW, W, NW, N, NE )
+	this.internodes = function( paths, options ){
+		var ins = [], palen=0, nextidx=0, nextidx2=0, previdx=0, previdx2=0, pacnt, pcnt;
+		
+		// paths loop
+		for(pacnt=0; pacnt<paths.length; pacnt++){
+			
+			ins[pacnt] = {};
+			ins[pacnt].points = [];
+			ins[pacnt].boundingbox = paths[pacnt].boundingbox;
+			ins[pacnt].holechildren = paths[pacnt].holechildren;
+			ins[pacnt].isholepath = paths[pacnt].isholepath;
+			palen = paths[pacnt].points.length;
+			
+			// pathpoints loop
+			for(pcnt=0; pcnt<palen; pcnt++){
+			
+				// next and previous point indexes
+				nextidx = (pcnt+1)%palen; nextidx2 = (pcnt+2)%palen; previdx = (pcnt-1+palen)%palen; previdx2 = (pcnt-2+palen)%palen;
+				
+				// right angle enhance
+				if( options.rightangleenhance && _this.testrightangle( paths[pacnt], previdx2, previdx, pcnt, nextidx, nextidx2 ) ){
+					
+					// Fix previous direction
+					if(ins[pacnt].points.length > 0){
+						ins[pacnt].points[ ins[pacnt].points.length-1 ].linesegment = _this.getdirection(
+								ins[pacnt].points[ ins[pacnt].points.length-1 ].x,
+								ins[pacnt].points[ ins[pacnt].points.length-1 ].y,
+								paths[pacnt].points[pcnt].x,
+								paths[pacnt].points[pcnt].y
+							);
+					}
+					
+					// This corner point
+					ins[pacnt].points.push({
+						x : paths[pacnt].points[pcnt].x,
+						y : paths[pacnt].points[pcnt].y,
+						linesegment : _this.getdirection(
+								paths[pacnt].points[pcnt].x,
+								paths[pacnt].points[pcnt].y,
+								(( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+								(( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2)
+							)
+					});
+					
+				}// End of right angle enhance
+				
+				// interpolate between two path points
+				ins[pacnt].points.push({
+					x : (( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+					y : (( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+					linesegment : _this.getdirection(
+							(( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+							(( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+							(( paths[pacnt].points[nextidx].x + paths[pacnt].points[nextidx2].x ) /2),
+							(( paths[pacnt].points[nextidx].y + paths[pacnt].points[nextidx2].y ) /2)
+						)
+				});
+				
+			}// End of pathpoints loop
+						
+		}// End of paths loop
+		
+		return ins;
+	},// End of internodes()
+	
+	this.testrightangle = function( path, idx1, idx2, idx3, idx4, idx5 ){
+		return ( (( path.points[idx3].x === path.points[idx1].x) &&
+				  ( path.points[idx3].x === path.points[idx2].x) &&
+				  ( path.points[idx3].y === path.points[idx4].y) &&
+				  ( path.points[idx3].y === path.points[idx5].y)
+				 ) ||
+				 (( path.points[idx3].y === path.points[idx1].y) &&
+				  ( path.points[idx3].y === path.points[idx2].y) &&
+				  ( path.points[idx3].x === path.points[idx4].x) &&
+				  ( path.points[idx3].x === path.points[idx5].x)
+				 )
+		);
+	},// End of testrightangle()
+	
+	this.getdirection = function( x1, y1, x2, y2 ){
+		var val = 8;
+		if(x1 < x2){
+			if     (y1 < y2){ val = 1; }// SouthEast
+			else if(y1 > y2){ val = 7; }// NE
+			else            { val = 0; }// E
+		}else if(x1 > x2){
+			if     (y1 < y2){ val = 3; }// SW
+			else if(y1 > y2){ val = 5; }// NW
+			else            { val = 4; }// W
+		}else{
+			if     (y1 < y2){ val = 2; }// S
+			else if(y1 > y2){ val = 6; }// N
+			else            { val = 8; }// center, this should not happen
+		}
+		return val;
+	},// End of getdirection()
+	
+	// 4. Batch interpollation
+	this.batchinternodes = function( bpaths, options ){
+		var binternodes = [];
+		for (var k in bpaths) {
+			if(!bpaths.hasOwnProperty(k)){ continue; }
+			binternodes[k] = _this.internodes(bpaths[k], options);
+		}
+		return binternodes;
+	},
+	
+	// 5. tracepath() : recursively trying to fit straight and quadratic spline segments on the 8 direction internode path
+	
+	// 5.1. Find sequences of points with only 2 segment types
+	// 5.2. Fit a straight line on the sequence
+	// 5.3. If the straight line fails (distance error > ltres), find the point with the biggest error
+	// 5.4. Fit a quadratic spline through errorpoint (project this to get controlpoint), then measure errors on every point in the sequence
+	// 5.5. If the spline fails (distance error > qtres), find the point with the biggest error, set splitpoint = fitting point
+	// 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+	
+	this.tracepath = function( path, ltres, qtres ){
+		var pcnt=0, segtype1, segtype2, seqend, smp = {};
+		smp.segments = [];
+		smp.boundingbox = path.boundingbox;
+		smp.holechildren = path.holechildren;
+		smp.isholepath = path.isholepath;
+		
+		while(pcnt < path.points.length){
+			// 5.1. Find sequences of points with only 2 segment types
+			segtype1 = path.points[pcnt].linesegment; segtype2 = -1; seqend=pcnt+1;
+			while(
+				((path.points[seqend].linesegment === segtype1) || (path.points[seqend].linesegment === segtype2) || (segtype2 === -1))
+				&& (seqend < path.points.length-1) ){
+				
+				if((path.points[seqend].linesegment!==segtype1) && (segtype2===-1)){ segtype2 = path.points[seqend].linesegment; }
+				seqend++;
+				
+			}
+			if(seqend === path.points.length-1){ seqend = 0; }
+
+			// 5.2. - 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+			smp.segments = smp.segments.concat( _this.fitseq(path, ltres, qtres, pcnt, seqend) );
+			
+			// forward pcnt;
+			if(seqend>0){ pcnt = seqend; }else{ pcnt = path.points.length; }
+			
+		}// End of pcnt loop
+		
+		return smp;
+	},// End of tracepath()
+		
+	// 5.2. - 5.6. recursively fitting a straight or quadratic line segment on this sequence of path nodes,
+	// called from tracepath()
+	this.fitseq = function( path, ltres, qtres, seqstart, seqend ){
+		// return if invalid seqend
+		if( (seqend>path.points.length) || (seqend<0) ){ return []; }
+		// variables
+		var errorpoint=seqstart, errorval=0, curvepass=true, px, py, dist2;
+		var tl = (seqend-seqstart); if(tl<0){ tl += path.points.length; }
+		var vx = (path.points[seqend].x-path.points[seqstart].x) / tl,
+			vy = (path.points[seqend].y-path.points[seqstart].y) / tl;
+		
+		// 5.2. Fit a straight line on the sequence
+		var pcnt = (seqstart+1) % path.points.length, pl;
+		while(pcnt != seqend){
+			pl = pcnt-seqstart; if(pl<0){ pl += path.points.length; }
+			px = path.points[seqstart].x + vx * pl; py = path.points[seqstart].y + vy * pl;
+			dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+			if(dist2>ltres){curvepass=false;}
+			if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+			pcnt = (pcnt+1)%path.points.length;
+		}
+		// return straight line if fits
+		if(curvepass){ return [{ type:'L', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:path.points[seqend].x, y2:path.points[seqend].y }]; }
+		
+		// 5.3. If the straight line fails (distance error>ltres), find the point with the biggest error
+		var fitpoint = errorpoint; curvepass = true; errorval = 0;
+		
+		// 5.4. Fit a quadratic spline through this point, measure errors on every point in the sequence
+		// helpers and projecting to get control point
+		var t=(fitpoint-seqstart)/tl, t1=(1-t)*(1-t), t2=2*(1-t)*t, t3=t*t;
+		var cpx = (t1*path.points[seqstart].x + t3*path.points[seqend].x - path.points[fitpoint].x)/-t2 ,
+			cpy = (t1*path.points[seqstart].y + t3*path.points[seqend].y - path.points[fitpoint].y)/-t2 ;
+		
+		// Check every point
+		pcnt = seqstart+1;
+		while(pcnt != seqend){
+			t=(pcnt-seqstart)/tl; t1=(1-t)*(1-t); t2=2*(1-t)*t; t3=t*t;
+			px = t1 * path.points[seqstart].x + t2 * cpx + t3 * path.points[seqend].x;
+			py = t1 * path.points[seqstart].y + t2 * cpy + t3 * path.points[seqend].y;
+			
+			dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+			
+			if(dist2>qtres){curvepass=false;}
+			if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+			pcnt = (pcnt+1)%path.points.length;
+		}
+		// return spline if fits
+		if(curvepass){ return [{ type:'Q', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:cpx, y2:cpy, x3:path.points[seqend].x, y3:path.points[seqend].y }]; }
+		// 5.5. If the spline fails (distance error>qtres), find the point with the biggest error
+		var splitpoint = fitpoint; // Earlier: Math.floor((fitpoint + errorpoint)/2);
+		
+		// 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+		return _this.fitseq( path, ltres, qtres, seqstart, splitpoint ).concat(
+				_this.fitseq( path, ltres, qtres, splitpoint, seqend ) );
+		
+	},// End of fitseq()
+	
+	// 5. Batch tracing paths
+	this.batchtracepaths = function(internodepaths,ltres,qtres){
+		var btracedpaths = [];
+		for(var k in internodepaths){
+			if(!internodepaths.hasOwnProperty(k)){ continue; }
+			btracedpaths.push( _this.tracepath(internodepaths[k],ltres,qtres) );
+		}
+		return btracedpaths;
+	},
+	
+	// 5. Batch tracing layers
+	this.batchtracelayers = function(binternodes, ltres, qtres){
+		var btbis = [];
+		for(var k in binternodes){
+			if(!binternodes.hasOwnProperty(k)){ continue; }
+			btbis[k] = _this.batchtracepaths(binternodes[k], ltres, qtres);
+		}
+		return btbis;
+	},
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  SVG Drawing functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Rounding to given decimals https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-in-javascript
+	this.roundtodec = function(val,places){ return +val.toFixed(places); },
+	
+	// Getting SVG path element string from a traced path
+	this.svgpathstring = function( tracedata, lnum, pathnum, options ){
+		
+		var layer = tracedata.layers[lnum], smp = layer[pathnum], str='', pcnt;
+		
+		// Line filter
+		if(options.linefilter && (smp.segments.length < 3)){ return str; }
+		
+		// Starting path element, desc contains layer and path number
+		str = '<path '+
+			( options.desc ? ('desc="l '+lnum+' p '+pathnum+'" ') : '' ) +
+			_this.tosvgcolorstr(tracedata.palette[lnum], options) +
+			'd="';
+		
+		// Creating non-hole path string
+		if( options.roundcoords === -1 ){
+			str += 'M '+ smp.segments[0].x1 * options.scale +' '+ smp.segments[0].y1 * options.scale +' ';
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				str += smp.segments[pcnt].type +' '+ smp.segments[pcnt].x2 * options.scale +' '+ smp.segments[pcnt].y2 * options.scale +' ';
+				if(smp.segments[pcnt].hasOwnProperty('x3')){
+					str += smp.segments[pcnt].x3 * options.scale +' '+ smp.segments[pcnt].y3 * options.scale +' ';
+				}
+			}
+			str += 'Z ';
+		}else{
+			str += 'M '+ _this.roundtodec( smp.segments[0].x1 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[0].y1 * options.scale, options.roundcoords ) +' ';
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				str += smp.segments[pcnt].type +' '+ _this.roundtodec( smp.segments[pcnt].x2 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y2 * options.scale, options.roundcoords ) +' ';
+				if(smp.segments[pcnt].hasOwnProperty('x3')){
+					str += _this.roundtodec( smp.segments[pcnt].x3 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y3 * options.scale, options.roundcoords ) +' ';
+				}
+			}
+			str += 'Z ';
+		}// End of creating non-hole path string
+		
+		// Hole children
+		for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+			var hsmp = layer[ smp.holechildren[hcnt] ];
+			// Creating hole path string
+			if( options.roundcoords === -1 ){
+				
+				if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+					str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale +' ';
+				}else{
+					str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale +' ';
+				}
+				
+				for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+					str += hsmp.segments[pcnt].type +' ';
+					if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+						str += hsmp.segments[pcnt].x2 * options.scale +' '+ hsmp.segments[pcnt].y2 * options.scale +' ';
+					}
+					
+					str += hsmp.segments[pcnt].x1 * options.scale +' '+ hsmp.segments[pcnt].y1 * options.scale +' ';
+				}
+				
+			}else{
+				
+				if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+					str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale ) +' ';
+				}else{
+					str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale ) +' ';
+				}
+				
+				for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+					str += hsmp.segments[pcnt].type +' ';
+					if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+						str += _this.roundtodec( hsmp.segments[pcnt].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y2 * options.scale ) +' ';
+					}
+					str += _this.roundtodec( hsmp.segments[pcnt].x1 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y1 * options.scale ) +' ';
+				}
+				
+				
+			}// End of creating hole path string
+			
+			str += 'Z '; // Close path
+			
+		}// End of holepath check
+		
+		// Closing path element
+		str += '" />';
+		
+		// Rendering control points
+		if(options.lcpr || options.qcpr){
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				if( smp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+					str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+					str += '<circle cx="'+ smp.segments[pcnt].x3 * options.scale +'" cy="'+ smp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+					str += '<line x1="'+ smp.segments[pcnt].x1 * options.scale +'" y1="'+ smp.segments[pcnt].y1 * options.scale +'" x2="'+ smp.segments[pcnt].x2 * options.scale +'" y2="'+ smp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+					str += '<line x1="'+ smp.segments[pcnt].x2 * options.scale +'" y1="'+ smp.segments[pcnt].y2 * options.scale +'" x2="'+ smp.segments[pcnt].x3 * options.scale +'" y2="'+ smp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+				}
+				if( (!smp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+					str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+				}
+			}
+			
+			// Hole children control points
+			for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+				var hsmp = layer[ smp.holechildren[hcnt] ];
+				for(pcnt=0; pcnt<hsmp.segments.length; pcnt++){
+					if( hsmp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+						str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+						str += '<circle cx="'+ hsmp.segments[pcnt].x3 * options.scale +'" cy="'+ hsmp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+						str += '<line x1="'+ hsmp.segments[pcnt].x1 * options.scale +'" y1="'+ hsmp.segments[pcnt].y1 * options.scale +'" x2="'+ hsmp.segments[pcnt].x2 * options.scale +'" y2="'+ hsmp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+						str += '<line x1="'+ hsmp.segments[pcnt].x2 * options.scale +'" y1="'+ hsmp.segments[pcnt].y2 * options.scale +'" x2="'+ hsmp.segments[pcnt].x3 * options.scale +'" y2="'+ hsmp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+					}
+					if( (!hsmp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+						str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+					}
+				}
+			}
+		}// End of Rendering control points
+			
+		return str;
+		
+	},// End of svgpathstring()
+	
+	// Converting tracedata to an SVG string
+	this.getsvgstring = function( tracedata, options ){
+		
+		options = _this.checkoptions(options);
+		
+		var w = tracedata.width * options.scale, h = tracedata.height * options.scale;
+		
+		// SVG start
+		var svgstr = '<svg ' + (options.viewbox ? ('viewBox="0 0 '+w+' '+h+'" ') : ('width="'+w+'" height="'+h+'" ')) +
+			'version="1.1" xmlns="http://www.w3.org/2000/svg" desc="Created with imagetracer.js version '+_this.versionnumber+'" >';
+
+		// Drawing: Layers and Paths loops
+		for(var lcnt=0; lcnt < tracedata.layers.length; lcnt++){
+			for(var pcnt=0; pcnt < tracedata.layers[lcnt].length; pcnt++){
+				
+				// Adding SVG <path> string
+				if( !tracedata.layers[lcnt][pcnt].isholepath ){
+					svgstr += _this.svgpathstring( tracedata, lcnt, pcnt, options );
+				}
+					
+			}// End of paths loop
+		}// End of layers loop
+		
+		// SVG End
+		svgstr+='</svg>';
+		
+		return svgstr;
+		
+	},// End of getsvgstring()
+	
+	// Comparator for numeric Array.sort
+	this.compareNumbers = function(a,b){ return a - b; },
+	
+	// Convert color object to rgba string
+	this.torgbastr = function(c){ return 'rgba('+c.r+','+c.g+','+c.b+','+c.a+')'; },
+	
+	// Convert color object to SVG color string
+	this.tosvgcolorstr = function(c, options){
+		return 'fill="rgb('+c.r+','+c.g+','+c.b+')" stroke="rgb('+c.r+','+c.g+','+c.b+')" stroke-width="'+options.strokewidth+'" opacity="'+c.a/255.0+'" ';
+	},
+	
+	// Helper function: Appending an <svg> element to a container from an svgstring
+	this.appendSVGString = function(svgstr,parentid){
+		var div;
+		if(parentid){
+			div = document.getElementById(parentid);
+			if(!div){
+				div = document.createElement('div');
+				div.id = parentid;
+				document.body.appendChild(div);
+			}
+		}else{
+			div = document.createElement('div');
+			document.body.appendChild(div);
+		}
+		div.innerHTML += svgstr;
+	},
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  Canvas functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Gaussian kernels for blur
+	this.gks = [ [0.27901,0.44198,0.27901], [0.135336,0.228569,0.272192,0.228569,0.135336], [0.086776,0.136394,0.178908,0.195843,0.178908,0.136394,0.086776],
+	             [0.063327,0.093095,0.122589,0.144599,0.152781,0.144599,0.122589,0.093095,0.063327], [0.049692,0.069304,0.089767,0.107988,0.120651,0.125194,0.120651,0.107988,0.089767,0.069304,0.049692] ],
+	
+	// Selective Gaussian blur for preprocessing
+	this.blur = function(imgd,radius,delta){
+		var i,j,k,d,idx,racc,gacc,bacc,aacc,wacc;
+		
+		// new ImageData
+		var imgd2 = { width:imgd.width, height:imgd.height, data:[] };
+		
+		// radius and delta limits, this kernel
+		radius = Math.floor(radius); if(radius<1){ return imgd; } if(radius>5){ radius = 5; } delta = Math.abs( delta ); if(delta>1024){ delta = 1024; }
+		var thisgk = _this.gks[radius-1];
+		
+		// loop through all pixels, horizontal blur
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+
+				racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+				// gauss kernel loop
+				for( k = -radius; k < radius+1; k++){
+					// add weighted color values
+					if( (i+k > 0) && (i+k < imgd.width) ){
+						idx = (j*imgd.width+i+k)*4;
+						racc += imgd.data[idx  ] * thisgk[k+radius];
+						gacc += imgd.data[idx+1] * thisgk[k+radius];
+						bacc += imgd.data[idx+2] * thisgk[k+radius];
+						aacc += imgd.data[idx+3] * thisgk[k+radius];
+						wacc += thisgk[k+radius];
+					}
+				}
+				// The new pixel
+				idx = (j*imgd.width+i)*4;
+				imgd2.data[idx  ] = Math.floor(racc / wacc);
+				imgd2.data[idx+1] = Math.floor(gacc / wacc);
+				imgd2.data[idx+2] = Math.floor(bacc / wacc);
+				imgd2.data[idx+3] = Math.floor(aacc / wacc);
+				
+			}// End of width loop
+		}// End of horizontal blur
+		
+		// copying the half blurred imgd2
+		var himgd = new Uint8ClampedArray(imgd2.data);
+		
+		// loop through all pixels, vertical blur
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+
+				racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+				// gauss kernel loop
+				for( k = -radius; k < radius+1; k++){
+					// add weighted color values
+					if( (j+k > 0) && (j+k < imgd.height) ){
+						idx = ((j+k)*imgd.width+i)*4;
+						racc += himgd[idx  ] * thisgk[k+radius];
+						gacc += himgd[idx+1] * thisgk[k+radius];
+						bacc += himgd[idx+2] * thisgk[k+radius];
+						aacc += himgd[idx+3] * thisgk[k+radius];
+						wacc += thisgk[k+radius];
+					}
+				}
+				// The new pixel
+				idx = (j*imgd.width+i)*4;
+				imgd2.data[idx  ] = Math.floor(racc / wacc);
+				imgd2.data[idx+1] = Math.floor(gacc / wacc);
+				imgd2.data[idx+2] = Math.floor(bacc / wacc);
+				imgd2.data[idx+3] = Math.floor(aacc / wacc);
+				
+			}// End of width loop
+		}// End of vertical blur
+		
+		// Selective blur: loop through all pixels
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+				
+				idx = (j*imgd.width+i)*4;
+				// d is the difference between the blurred and the original pixel
+				d = Math.abs(imgd2.data[idx  ] - imgd.data[idx  ]) + Math.abs(imgd2.data[idx+1] - imgd.data[idx+1]) +
+					Math.abs(imgd2.data[idx+2] - imgd.data[idx+2]) + Math.abs(imgd2.data[idx+3] - imgd.data[idx+3]);
+				// selective blur: if d>delta, put the original pixel back
+				if(d>delta){
+					imgd2.data[idx  ] = imgd.data[idx  ];
+					imgd2.data[idx+1] = imgd.data[idx+1];
+					imgd2.data[idx+2] = imgd.data[idx+2];
+					imgd2.data[idx+3] = imgd.data[idx+3];
+				}
+			}
+		}// End of Selective blur
+		
+		return imgd2;
+		
+	},// End of blur()
+	
+	// Helper function: loading an image from a URL, then executing callback with canvas as argument
+	this.loadImage = function(url,callback,options){
+		var img = new Image();
+		if(options && options.corsenabled){ img.crossOrigin = 'Anonymous'; }
+		img.onload = function(){
+			var canvas = document.createElement('canvas');
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var context = canvas.getContext('2d');
+			context.drawImage(img,0,0);
+			callback(canvas);
+		};
+		img.src = url;
+	},
+	
+	// Helper function: getting ImageData from a canvas
+	this.getImgdata = function(canvas){
+		var context = canvas.getContext('2d');
+		return context.getImageData(0,0,canvas.width,canvas.height);
+	},
+	
+	// Special palette to use with drawlayers()
+	this.specpalette = [
+		{r:0,g:0,b:0,a:255}, {r:128,g:128,b:128,a:255}, {r:0,g:0,b:128,a:255}, {r:64,g:64,b:128,a:255},
+		{r:192,g:192,b:192,a:255}, {r:255,g:255,b:255,a:255}, {r:128,g:128,b:192,a:255}, {r:0,g:0,b:192,a:255},
+		{r:128,g:0,b:0,a:255}, {r:128,g:64,b:64,a:255}, {r:128,g:0,b:128,a:255}, {r:168,g:168,b:168,a:255},
+		{r:192,g:128,b:128,a:255}, {r:192,g:0,b:0,a:255}, {r:255,g:255,b:255,a:255}, {r:0,g:128,b:0,a:255}
+	],
+	
+	// Helper function: Drawing all edge node layers into a container
+	this.drawLayers = function(layers,palette,scale,parentid){
+		scale = scale||1;
+		var w,h,i,j,k;
+		
+		// Preparing container
+		var div;
+		if(parentid){
+			div = document.getElementById(parentid);
+			if(!div){
+				div = document.createElement('div');
+				div.id = parentid;
+				document.body.appendChild(div);
+			}
+		}else{
+			div = document.createElement('div');
+			document.body.appendChild(div);
+		}
+		
+		// Layers loop
+		for (k in layers) {
+			if(!layers.hasOwnProperty(k)){ continue; }
+			
+			// width, height
+			w=layers[k][0].length; h=layers[k].length;
+			
+			// Creating new canvas for every layer
+			var canvas = document.createElement('canvas'); canvas.width=w*scale; canvas.height=h*scale;
+			var context = canvas.getContext('2d');
+			
+			// Drawing
+			for(j=0; j<h; j++){
+				for(i=0; i<w; i++){
+					context.fillStyle = _this.torgbastr(palette[ layers[k][j][i]%palette.length ]);
+					context.fillRect(i*scale,j*scale,scale,scale);
+				}
+			}
+			
+			// Appending canvas to container
+			div.appendChild(canvas);
+		}// End of Layers loop
+	}// End of drawlayers
+	
+	;// End of function list
+	
+}// End of ImageTracer object
+
+// export as AMD module / Node module / browser or worker variable
+if(typeof define === 'function' && define.amd){
+	define(function() { return new ImageTracer(); });
+}else if(typeof module !== 'undefined'){
+	module.exports = new ImageTracer();
+}else if(typeof self !== 'undefined'){
+	self.ImageTracer = new ImageTracer();
+}else window.ImageTracer = new ImageTracer();
+
+})();
+</script>
 <script>
 const $=id=>document.getElementById(id);
 const controls=['w','h','qty','shape','radius','shoulderInset','shoulderTopH','flapColor','holesOn','holeCount','holeShape','topGap','sideGap','holeH','holeW'];
@@ -789,12 +2135,13 @@ let state={
   logos:[], texts:[], selected:null, selectedType:null,
   flap:{w:190,h:25,qty:'',shape:'square',radius:5,shoulderInset:5,shoulderTopH:5,color:'#080808'},
   holes:{on:true,count:6,shape:'round',top:3,side:10,h:1.2,w:2.2},
-  ui:{wideMode:false,zones:true,zoneCenter:50}
+  ui:{wideMode:false,zones:true,zoneCenter:50,topGuideOn:false,showColorCount:false,manualColorCount:''}
 };
 let history=[];
 let redoHistory=[];
 let suppressHistory=false;
 let drag=null;
+let suppressClickAfterDrag=false;
 let multiSelection=[]; // array of {id,type}; primary selection remains state.selected/state.selectedType
 let internalClipboard=[];
 
@@ -851,8 +2198,9 @@ function toast(message){
 function scaleFactor(){
   const w=Math.max(10,state.flap.w),h=Math.max(5,state.flap.h);
   const wrap=$('previewWrap');
-  const availableW=wrap ? Math.max(180,wrap.clientWidth-150) : Math.max(180,window.innerWidth-500);
-  const availableH=wrap ? Math.max(180,wrap.clientHeight-150) : 360;
+  const phone=window.matchMedia('(max-width:700px)').matches;
+  const availableW=wrap ? Math.max(phone?120:180,wrap.clientWidth-(phone?90:150)) : Math.max(180,window.innerWidth-500);
+  const availableH=wrap ? Math.max(phone?40:180,wrap.clientHeight-(phone?70:150)) : 360;
   const maxW=Math.min(980,availableW);
   const maxH=Math.min(360,availableH);
   return Math.max(.1,Math.min(maxW/w,maxH/h));
@@ -895,8 +2243,23 @@ function syncUIFromState(){
   const sidePct=(100-state.ui.zoneCenter)/2;
   $('wideLayoutNote').textContent=`Links ${sidePct}% · Midden ${state.ui.zoneCenter}% · Rechts ${sidePct}%`;
   $('wideToolsBody').classList.toggle('open',state.ui.wideMode===true);
+  $('topGuideOn').checked=state.ui.topGuideOn===true;
+  $('showColorCount').checked=state.ui.showColorCount===true;
+  $('manualColorCount').value=state.ui.manualColorCount||'';
   syncSelectionControls();
 }
+
+['topGuideOn','showColorCount','manualColorCount'].forEach(id=>{
+  $(id).addEventListener('change',()=>{
+    pushHistory();
+    state.ui.topGuideOn=$('topGuideOn').checked;
+    state.ui.showColorCount=$('showColorCount').checked;
+    const n=Number($('manualColorCount').value);
+    state.ui.manualColorCount=$('manualColorCount').value&&Number.isFinite(n)?Math.max(1,Math.min(99,Math.round(n))):'';
+    $('manualColorCount').value=state.ui.manualColorCount;
+    render();
+  });
+});
 
 
 function selectionKey(id,type){return `${type}:${id}`;}
@@ -959,7 +2322,15 @@ function setSelected(id,type,additive=false){
 function syncSelectionControls(){
   const logo=state.selectedType==='logo'?itemById(state.selected,'logo'):null;
   $('logoControls').style.display=logo?'block':'none';
+  const canTrace=!!logo&&(!logo.svgMarkup||!!logo.originalRasterSrc);
+  $('vectorizeLogo').disabled=!canTrace;
+  $('restoreRasterLogo').disabled=!logo?.originalRasterSrc;
+  $('vectorTarget').textContent=logo
+    ? canTrace?`Geselecteerd: ${logo.name||'afbeelding'}. Alleen deze afbeelding wordt omgezet; het kleurenaantal van het hele ontwerp staat hierboven.`:`Geselecteerd: ${logo.name||'SVG'}. Dit is al een vectorbestand. Kies een PNG/JPG/WebP om kleuren te beperken.`
+    :'Selecteer een PNG, JPG of WebP in de preview. De omzetting geldt voor die afbeelding; het kleurenaantal hierboven voor het hele ontwerp.';
   if(logo){
+    $('selectedLogoVectorCheck').checked=!!logo.svgMarkup;
+    $('selectedLogoVectorLabel').textContent=logo.svgMarkup?'Vectorbestand ✓':'Nog geen vectorbestand';
     if(!logo.ratio || !isFinite(logo.ratio) || logo.ratio<=0) logo.ratio=(logo.w/logo.h)||1;
     $('logoW').value=Math.round(logo.w*100)/100;
     $('logoH').value=Math.round(logo.h*100)/100;
@@ -1003,11 +2374,12 @@ function makeCompressedDataUrl(file){
       const img=new Image();
       img.onload=()=>{
         let w=img.naturalWidth,h=img.naturalHeight;
-        const maxW=900,maxH=500,scale=Math.min(1,maxW/w,maxH/h);
+        const lossless=file.type==='image/png'||file.type==='image/webp';
+        const maxW=lossless?1200:900,maxH=lossless?800:500,scale=Math.min(1,maxW/w,maxH/h);
         w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
         const c=document.createElement('canvas');c.width=w;c.height=h;
         const ctx=c.getContext('2d');ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
-        try{resolve({src:c.toDataURL('image/webp',0.82),ratio:w/h,name:file.name});}
+        try{resolve({src:c.toDataURL(lossless?'image/png':'image/webp',0.9),ratio:w/h,name:file.name});}
         catch(e){resolve({src:reader.result,ratio:w/h,name:file.name});}
       };
       img.onerror=reject;img.src=reader.result;
@@ -1016,21 +2388,277 @@ function makeCompressedDataUrl(file){
   });
 }
 
-$('file').addEventListener('change',async e=>{
-  const files=[...e.target.files]; if(!files.length)return;
-  pushHistory();
+function safeSvgMarkup(source){
+  const doc=new DOMParser().parseFromString(source,'image/svg+xml');
+  const root=doc.documentElement;
+  if(root.localName!=='svg'||doc.querySelector('parsererror'))throw new Error('Ongeldige SVG');
+  const blocked=new Set(['script','foreignObject','iframe','object','embed','image','use','animate','animateTransform','set']);
+  const walker=doc.createTreeWalker(root,NodeFilter.SHOW_ELEMENT);
+  const nodes=[root];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const el of nodes){
+    if(blocked.has(el.localName)){el.remove();continue;}
+    if(el.localName==='style'){
+      const css=el.textContent.replace(/url\(\s*(['"]?)#[\w.-]+\1\s*\)/gi,'');
+      if(/@import|url\s*\(|expression\s*\(|javascript:|data:/i.test(css)){el.remove();continue;}
+    }
+    for(const attr of [...el.attributes]){
+      const name=attr.name.toLowerCase(),value=attr.value;
+      const withoutLocalPaint=value.replace(/url\(\s*(['"]?)#[\w.-]+\1\s*\)/gi,'');
+      if(name.startsWith('on')||name==='href'||name.endsWith(':href')||/url\s*\(|javascript:|data:/i.test(withoutLocalPaint))el.removeAttribute(attr.name);
+    }
+  }
+  root.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  return new XMLSerializer().serializeToString(root);
+}
+
+function svgLogoData(file){
+  return file.text().then(source=>{
+    const markup=safeSvgMarkup(source);
+    const root=new DOMParser().parseFromString(markup,'image/svg+xml').documentElement;
+    const box=(root.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(Number);
+    const w=box.length===4&&box[2]>0?box[2]:parseFloat(root.getAttribute('width'))||1;
+    const h=box.length===4&&box[3]>0?box[3]:parseFloat(root.getAttribute('height'))||1;
+    return {src:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(markup),svgMarkup:markup,ratio:w/h,name:file.name,vector:true};
+  });
+}
+
+async function addLogoFiles(files){
+  let added=0;
   for(const f of files){
     try{
-      const d=await makeCompressedDataUrl(f);
+      const d=(f.type==='image/svg+xml'||/\.svg$/i.test(f.name))?await svgLogoData(f):await makeCompressedDataUrl(f);
       const lw=Math.min(state.flap.w*.35,70),lh=lw/(d.ratio||4);
-      const obj={id:'l'+Date.now()+Math.random(),name:d.name,src:d.src,w:lw,h:lh,ratio:(d.ratio||lw/lh||1),x:.5,y:.5};
+      const obj={id:'l'+Date.now()+Math.random(),name:d.name,src:d.src,svgMarkup:d.svgMarkup||null,vector:!!d.vector,w:lw,h:lh,ratio:(d.ratio||lw/lh||1),x:.5,y:.5};
+      if(!added)pushHistory();
       state.logos.push(obj);state.selected=obj.id;state.selectedType='logo';
-    }catch(err){}
+      added++;
+    }catch(err){console.error('Logo toevoegen mislukt',err);}
   }
+  if(added){
+    if($('logosSection'))$('logosSection').open=true;
+    syncSelectionControls();render();
+    $('pasteLogoStatus').textContent=`${added} afbeelding${added===1?'':'en'} toegevoegd. Je kunt ook een afbeelding kopiëren en hier op Ctrl/⌘+V drukken.`;
+  }else $('pasteLogoStatus').textContent='Geen ondersteunde afbeelding gevonden. Gebruik PNG, JPG, WebP of SVG.';
+  return added;
+}
+
+$('file').addEventListener('change',async e=>{
+  const files=[...e.target.files];
+  if(files.length)await addLogoFiles(files);
   e.target.value='';
-  if($('logosSection'))$('logosSection').open=true;
-  syncSelectionControls();render();
 });
+
+document.addEventListener('paste',async e=>{
+  if(e.target instanceof Element&&e.target.closest('input,textarea,[contenteditable="true"]'))return;
+  const files=[...(e.clipboardData?.items||[])]
+    .filter(item=>/^image\/(png|jpeg|webp|svg\+xml)$/i.test(item.type))
+    .map(item=>item.getAsFile()).filter(Boolean);
+  if(!files.length){
+    if(internalClipboard.length){e.preventDefault();pasteInternalClipboard();}
+    return;
+  }
+  e.preventDefault();
+  await addLogoFiles(files);
+});
+
+$('pasteLogo').onclick=async()=>{
+  try{
+    if(!navigator.clipboard?.read)throw new Error('Klembord niet beschikbaar');
+    const items=await navigator.clipboard.read(),files=[];
+    for(const item of items){
+      const type=item.types.find(type=>/^image\/(svg\+xml|png|jpeg|webp)$/i.test(type));
+      if(!type)continue;
+      const blob=await item.getType(type);
+      const ext=type==='image/svg+xml'?'svg':type.split('/')[1]==='jpeg'?'jpg':type.split('/')[1];
+      files.push(new File([blob],`geplakte-afbeelding-${Date.now()}.${ext}`,{type}));
+    }
+    if(!files.length)throw new Error('Geen afbeelding op het klembord');
+    await addLogoFiles(files);
+  }catch(err){
+    $('pasteLogoStatus').textContent='Plakknop niet beschikbaar in deze browser. Klik buiten een tekstveld en druk op Ctrl/⌘+V.';
+  }
+};
+
+async function vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold){
+  const img=new Image();
+  img.src=logo.originalRasterSrc||logo.src;
+  await img.decode();
+  const maxSide=edgeStyle==='detail'?500:400,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+  const w=Math.max(1,Math.round(img.naturalWidth*scale));
+  const h=Math.max(1,Math.round(img.naturalHeight*scale));
+  const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+  const rgba=ctx.getImageData(0,0,w,h).data;
+  let transparentPixels=0;
+  for(let i=3;i<rgba.length;i+=4)if(rgba[i]<250)transparentPixels++;
+  const hasTransparency=transparentPixels>w*h*.01;
+  const visible=new Uint8Array(w*h);
+  let pixels=0;
+  for(let p=0;p<visible.length;p++){
+    const i=p*4;
+    if(rgba[i+3]<alphaThreshold)continue;
+    if(whiteCutout&&!hasTransparency&&(rgba[i]*.2126+rgba[i+1]*.7152+rgba[i+2]*.0722)<lightThreshold)continue;
+    visible[p]=1;pixels++;
+  }
+  if(!pixels)throw new Error('Geen zichtbare logodelen gevonden. Verlaag de lichtgrens of transparantiegrens.');
+
+  // Remove isolated compression specks before finding the bounds. Larger details remain intact.
+  if(pixels>100){
+    const seen=new Uint8Array(visible.length),queue=new Int32Array(visible.length);
+    for(let start=0;start<visible.length;start++){
+      if(!visible[start]||seen[start])continue;
+      let head=0,tail=1;queue[0]=start;seen[start]=1;
+      while(head<tail){
+        const p=queue[head++],x=p%w,y=Math.floor(p/w);
+        if(x>0&&visible[p-1]&&!seen[p-1]){seen[p-1]=1;queue[tail++]=p-1;}
+        if(x<w-1&&visible[p+1]&&!seen[p+1]){seen[p+1]=1;queue[tail++]=p+1;}
+        if(y>0&&visible[p-w]&&!seen[p-w]){seen[p-w]=1;queue[tail++]=p-w;}
+        if(y<h-1&&visible[p+w]&&!seen[p+w]){seen[p+w]=1;queue[tail++]=p+w;}
+      }
+      if(tail<=2)for(let j=0;j<tail;j++)visible[queue[j]]=0;
+    }
+  }
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let p=0;p<visible.length;p++)if(visible[p]){
+    const x=p%w,y=Math.floor(p/w);
+    minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+  }
+  if(maxX<0)throw new Error('Geen zichtbare logodelen gevonden');
+  const crop={x:Math.max(0,minX-1),y:Math.max(0,minY-1)};
+  crop.w=Math.min(w,maxX+2)-crop.x;crop.h=Math.min(h,maxY+2)-crop.y;
+  const cropped=new Uint8ClampedArray(crop.w*crop.h*4);
+  const samples=[];
+  const sampleStep=Math.max(1,Math.ceil(pixels/40000));
+  let visibleIndex=0;
+  for(let y=0;y<crop.h;y++)for(let x=0;x<crop.w;x++){
+    const source=((y+crop.y)*w+x+crop.x),i=source*4,d=(y*crop.w+x)*4;
+    if(!visible[source])continue;
+    cropped[d]=rgba[i];cropped[d+1]=rgba[i+1];cropped[d+2]=rgba[i+2];cropped[d+3]=255;
+    if(visibleIndex++%sampleStep===0)samples.push([rgba[i],rgba[i+1],rgba[i+2]]);
+  }
+  const styles={
+    smooth:{ltres:.2,qtres:1.5,pathomit:2,rightangleenhance:false},
+    sharp:{ltres:.5,qtres:.5,pathomit:1,rightangleenhance:true},
+    detail:{ltres:.08,qtres:.55,pathomit:0,rightangleenhance:false}
+  };
+  if(count===1){
+    for(let i=0;i<cropped.length;i+=4){
+      if(cropped[i+3])cropped[i]=cropped[i+1]=cropped[i+2]=255;
+    }
+  }
+  let palette=[];
+  if(count===1)palette=[[255,255,255]];
+  else{
+    if(!samples.length){
+      for(let i=0;i<cropped.length;i+=4)if(cropped[i+3]){samples.push([cropped[i],cropped[i+1],cropped[i+2]]);break;}
+    }
+    const buckets=new Map();
+    for(const p of samples){
+      const key=((p[0]>>3)<<10)|((p[1]>>3)<<5)|(p[2]>>3);
+      const b=buckets.get(key)||[0,0,0,0];b[0]+=p[0];b[1]+=p[1];b[2]+=p[2];b[3]++;buckets.set(key,b);
+    }
+    const bins=[...buckets.values()].map(b=>({rgb:b.slice(0,3).map(v=>Math.round(v/b[3])),n:b[3]}));
+    bins.sort((a,b)=>b.n-a.n);
+    palette=[bins[0].rgb.slice()];
+    while(palette.length<Math.min(count,bins.length)){
+      let best=null,score=-1;
+      for(const bin of bins){
+        const d=Math.min(...palette.map(p=>(p[0]-bin.rgb[0])**2+(p[1]-bin.rgb[1])**2+(p[2]-bin.rgb[2])**2));
+        const s=d*Math.sqrt(bin.n);
+        if(s>score){score=s;best=bin.rgb;}
+      }
+      if(!best||score===0)break;
+      palette.push(best.slice());
+    }
+  }
+  const nearest=(r,g,b)=>{
+    let best=0,dist=Infinity;
+    palette.forEach((p,j)=>{const d=(r-p[0])**2+(g-p[1])**2+(b-p[2])**2;if(d<dist){dist=d;best=j;}});
+    return best;
+  };
+  for(let step=0;step<(count===1?0:12);step++){
+    const sums=palette.map(()=>[0,0,0,0]);
+    for(const [r,g,b] of samples){const s=sums[nearest(r,g,b)];s[0]+=r;s[1]+=g;s[2]+=b;s[3]++;}
+    sums.forEach((s,j)=>{if(s[3])palette[j]=s.slice(0,3).map(v=>Math.round(v/s[3]));});
+  }
+  const hex=p=>'#'+p.map(n=>Math.max(0,Math.min(255,n)).toString(16).padStart(2,'0')).join('');
+  for(let i=0;i<cropped.length;i+=4){
+    if(!cropped[i+3])continue;
+    const j=nearest(cropped[i],cropped[i+1],cropped[i+2]);
+    cropped[i]=palette[j][0];cropped[i+1]=palette[j][1];cropped[i+2]=palette[j][2];
+  }
+  const pal=[{r:0,g:0,b:0,a:0},...palette.map(p=>({r:p[0],g:p[1],b:p[2],a:255}))];
+  const traced=ImageTracer.imagedataToSVG({width:crop.w,height:crop.h,data:cropped},{
+    pal,colorquantcycles:1,...(styles[edgeStyle]||styles.smooth),
+    strokewidth:0,linefilter:true,viewbox:true,roundcoords:2,desc:false
+  });
+  const doc=new DOMParser().parseFromString(traced,'image/svg+xml');
+  if(doc.querySelector('parsererror'))throw new Error('Vectorpaden maken mislukt');
+  let paths=0;
+  const retainedColors=new Set();
+  doc.querySelectorAll('path').forEach(path=>{
+    if(path.hasAttribute('opacity')&&Number(path.getAttribute('opacity'))===0){path.remove();return;}
+    if(count===1)path.setAttribute('fill',singleColor);
+    else{
+      const match=path.getAttribute('fill')?.match(/rgb\((\d+),(\d+),(\d+)\)/);
+      if(match)retainedColors.add(hex(match.slice(1).map(Number)).toUpperCase());
+    }
+    path.setAttribute('stroke','none');path.removeAttribute('opacity');paths++;
+  });
+  if(!paths)throw new Error('Geen vectorpaden gevonden. Kies Meer detail.');
+  doc.documentElement.setAttribute('width',String(crop.w));
+  doc.documentElement.setAttribute('height',String(crop.h));
+  return {markup:new XMLSerializer().serializeToString(doc.documentElement),colors:count===1?[singleColor.toUpperCase()]:[...retainedColors],crop,sourceW:w,sourceH:h};
+}
+
+$('vectorizeLogo').onclick=async()=>{
+  const logo=itemById(state.selected,'logo');
+  if(!logo){$('vectorStatus').textContent='Selecteer eerst een logo.';return;}
+  if(logo.svgMarkup&&!logo.originalRasterSrc){$('vectorStatus').textContent='Dit SVG-logo is al vector. Upload de originele PNG/JPG om kleuren te beperken.';return;}
+  const count=Math.max(1,Math.min(8,Math.round(Number($('vectorColorCount').value)||1)));
+  const singleColor=normalizeHex($('vectorSingleColor').value);
+  const whiteCutout=$('vectorWhiteCutout').checked;
+  const edgeStyle=$('vectorEdgeStyle').value;
+  const lightThreshold=Math.max(0,Math.min(255,Math.round(Number($('vectorLightThreshold').value)||0)));
+  const alphaThreshold=Math.max(1,Math.min(255,Math.round(Number($('vectorAlphaThreshold').value)||1)));
+  const btn=$('vectorizeLogo');btn.disabled=true;$('vectorStatus').textContent='Logo omzetten...';
+  try{
+    const result=await vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold);
+    pushHistory();
+    if(!logo.originalRasterSrc)logo.originalRasterSrc=logo.src;
+    const old=logo.vectorCrop||{x:0,y:0,w:1,h:1};
+    const next={x:result.crop.x/result.sourceW,y:result.crop.y/result.sourceH,w:result.crop.w/result.sourceW,h:result.crop.h/result.sourceH};
+    const oldW=logo.w,oldH=logo.h,oldLeft=logo.x*state.flap.w-oldW/2,oldTop=logo.y*state.flap.h-oldH/2;
+    const newW=oldW*next.w/old.w,newH=oldH*next.h/old.h;
+    const newLeft=oldLeft+oldW*(next.x-old.x)/old.w;
+    const newTop=oldTop+oldH*(next.y-old.y)/old.h;
+    logo.w=newW;logo.h=newH;logo.ratio=newW/newH;
+    logo.x=(newLeft+newW/2)/state.flap.w;logo.y=(newTop+newH/2)/state.flap.h;
+    logo.vectorCrop=next;
+    logo.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(result.markup);
+    logo.svgMarkup=result.markup;logo.vector=true;logo.printColors=result.colors;
+    $('vectorStatus').textContent=`Vectorlogo gemaakt met ${result.colors.length} kleuren: ${result.colors.join(', ')}. Controleer de preview.`;
+    syncSelectionControls();
+    render();
+  }catch(err){console.error(err);$('vectorStatus').textContent=`Omzetten lukte niet: ${err.message||'probeer een andere PNG of JPG'}`;}
+  finally{btn.disabled=false;}
+};
+$('restoreRasterLogo').onclick=()=>{
+  const logo=itemById(state.selected,'logo');
+  if(!logo?.originalRasterSrc)return;
+  pushHistory();
+  const crop=logo.vectorCrop||{x:0,y:0,w:1,h:1};
+  const fullW=logo.w/crop.w,fullH=logo.h/crop.h;
+  const left=logo.x*state.flap.w-logo.w/2-fullW*crop.x;
+  const top=logo.y*state.flap.h-logo.h/2-fullH*crop.y;
+  logo.w=fullW;logo.h=fullH;logo.ratio=fullW/fullH;
+  logo.x=(left+fullW/2)/state.flap.w;logo.y=(top+fullH/2)/state.flap.h;
+  logo.src=logo.originalRasterSrc;
+  delete logo.originalRasterSrc;delete logo.vectorCrop;
+  logo.svgMarkup=null;logo.vector=false;delete logo.printColors;
+  $('vectorStatus').textContent='Originele afbeelding hersteld. Je kunt opnieuw fijn afstellen en omzetten.';
+  syncSelectionControls();render();
+};
 
 $('logoW').addEventListener('change',()=>{
   const x=itemById(state.selected,'logo');if(!x)return;
@@ -1074,9 +2702,7 @@ function alignLogo(horizontal,vertical){
   if(horizontal==='left')x.x=x.w/(2*state.flap.w);
   if(horizontal==='center')x.x=.5;
   if(horizontal==='right')x.x=1-x.w/(2*state.flap.w);
-  if(vertical==='top')x.y=x.h/(2*state.flap.h);
-  if(vertical==='middle')x.y=.5;
-  if(vertical==='bottom')x.y=1-x.h/(2*state.flap.h);
+  if(vertical)x.y=verticalPlacement(x.h,vertical);
   syncSelectionControls();render();
 }
 $('alignLogoLeft').onclick=()=>alignLogo('left',null);
@@ -1093,7 +2719,7 @@ $('fitItem').onclick=()=>{
   if(!x.ratio || !isFinite(x.ratio) || x.ratio<=0) x.ratio=(x.w/x.h)||1;
   const ratio=x.ratio;let w=state.flap.w*.28,h=w/ratio;
   if(h>state.flap.h*.55){h=state.flap.h*.55;w=h*ratio;}
-  x.w=w;x.h=h;x.x=.5;x.y=.5;syncSelectionControls();render();
+  x.w=w;x.h=h;x.x=.5;x.y=verticalPlacement(h,'middle');syncSelectionControls();render();
 };
 $('deleteItem').onclick=deleteSelectedObject;
 
@@ -1162,7 +2788,8 @@ updateFontPreviews();
 
 $('addText').onclick=()=>{
   const v=$('textValue').value.trim();if(!v)return;pushHistory();
-  const obj={id:'t'+Date.now()+Math.random(),text:v,size:Math.max(.5,Number($('textSize').value)||5),color:normalizeHex($('textColorHex').value),font:$('textFont').value||'Arial, sans-serif',x:.5,y:.5,align:'center'};
+  const size=Math.max(.5,Number($('textSize').value)||5);
+  const obj={id:'t'+Date.now()+Math.random(),text:v,size,color:normalizeHex($('textColorHex').value),font:$('textFont').value||'Arial, sans-serif',x:.5,y:verticalPlacement(size,'middle'),align:'center'};
   state.texts.push(obj);state.selected=obj.id;state.selectedType='text';$('textValue').value='';
   syncSelectionControls();render();
 };
@@ -1173,7 +2800,14 @@ $('addText').onclick=()=>{
     t.color=normalizeHex($('editTextColorHex').value);t.align=$('editTextAlign').value;t.font=$('editTextFont').value||'Arial, sans-serif';render();
   });
 });
-$('centerText').onclick=()=>{const t=itemById(state.selected,'text');if(!t)return;pushHistory();t.x=.5;t.y=.5;render();};
+$('centerText').onclick=()=>{const t=itemById(state.selected,'text');if(!t)return;pushHistory();t.x=.5;t.y=verticalPlacement(t.size,'middle');syncSelectionControls();render();};
+['top','middle','bottom'].forEach(position=>{
+  const id='alignText'+position[0].toUpperCase()+position.slice(1);
+  $(id).onclick=()=>{
+    const t=itemById(state.selected,'text');if(!t)return;
+    pushHistory();t.y=verticalPlacement(t.size,position);syncSelectionControls();render();
+  };
+});
 
 function deleteSelectedObject(){
   const refs=allSelectedRefs();
@@ -1251,6 +2885,10 @@ $('duplicateSelected').onclick=duplicateSelectedObjects;
 
 
 document.addEventListener('keydown',e=>{
+  if($('pdfViewer').classList.contains('open')){
+    if(e.key==='Escape'){e.preventDefault();closePdfViewer();}
+    return;
+  }
   const tag=(document.activeElement?.tagName||'').toLowerCase();
   const editable=document.activeElement?.isContentEditable;
   const typing=tag==='input' || tag==='textarea' || tag==='select' || editable;
@@ -1261,9 +2899,7 @@ document.addEventListener('keydown',e=>{
   if(!typing && mod && key==='c'){
     e.preventDefault();copySelectedObjects();return;
   }
-  if(!typing && mod && key==='v'){
-    e.preventDefault();pasteInternalClipboard();return;
-  }
+  // Laat Ctrl/Cmd+V aan het paste-event over: een afbeelding op het systeemklembord gaat voor.
   if(!typing && mod && key==='x'){
     e.preventDefault();cutSelectedObjects();return;
   }
@@ -1298,8 +2934,10 @@ document.addEventListener('keydown',e=>{
     refs.forEach(r=>{
       const obj=itemById(r.id,r.type);
       if(!obj)return;
-      obj.x=Math.max(0,Math.min(1,obj.x+dx/state.flap.w));
-      obj.y=Math.max(0,Math.min(1,obj.y+dy/state.flap.h));
+      const halfX=r.type==='logo'?Math.min(.5,obj.w/(2*state.flap.w)):0;
+      const halfY=Math.min(.5,(r.type==='logo'?obj.h:obj.size)/(2*state.flap.h));
+      obj.x=Math.max(halfX,Math.min(1-halfX,obj.x+dx/state.flap.w));
+      obj.y=Math.max(halfY,Math.min(1-halfY,obj.y+dy/state.flap.h));
     });
     syncSelectionControls();render();
     return;
@@ -1311,6 +2949,7 @@ $('deleteText').onclick=deleteSelectedObject;
 
 $('wideMode').addEventListener('change',()=>{
   if(!state.ui)state.ui={wideMode:false,zones:true,zoneCenter:50};
+  pushHistory();
   state.ui.wideMode=$('wideMode').checked;
   $('wideToolsBody').classList.toggle('open',state.ui.wideMode);
   render();
@@ -1330,6 +2969,7 @@ $('zoneCenter').addEventListener('change',()=>{
 
 $('zonesOn').addEventListener('change',()=>{
   if(!state.ui)state.ui={wideMode:false,zones:true,zoneCenter:50};
+  pushHistory();
   state.ui.zones=$('zonesOn').checked;
   render();
 });
@@ -1462,7 +3102,7 @@ function renderLists(){
   const ll=$('logoList');ll.innerHTML='';
   state.logos.forEach((x,i)=>{
     const d=document.createElement('div');d.className='list-item'+(state.selected===x.id?' active':'');
-    const name=document.createElement('span');name.textContent=`Logo ${i+1}: ${x.name}`;
+    const name=document.createElement('span');name.textContent=`Logo ${i+1}: ${x.name}${x.svgMarkup?' ✓ Vector':''}`;
     const actions=document.createElement('div');actions.className='list-actions';
     const b=document.createElement('button');b.textContent='Selecteer';b.onclick=()=>setSelected(x.id,'logo');
     const dup=document.createElement('button');dup.textContent='⧉';dup.title='Dupliceren';dup.onclick=e=>{e.stopPropagation();setSelected(x.id,'logo');duplicateSelectedObjects();};
@@ -1482,6 +3122,42 @@ function renderLists(){
     del.onclick=e=>{e.stopPropagation();state.selected=x.id;state.selectedType='text';deleteSelectedObject();toast('Tekst verwijderd');};
     actions.append(b,dup,del);d.append(name,actions);tl.appendChild(d);
   });
+}
+
+function colorCountInfo(){
+  const manual=Number(state.ui?.manualColorCount);
+  if(state.ui?.manualColorCount!==''&&Number.isInteger(manual)&&manual>0){
+    return {label:`${manual} drukkleur${manual===1?'':'en'}`,status:'Handmatig ingevuld; controleer dit vóór je de preview verstuurt.'};
+  }
+  const colors=new Set();
+  let unknown=false;
+  state.texts.forEach(t=>{if(String(t.text||'').trim())colors.add(normalizeHex(t.color));});
+  state.logos.forEach(logo=>{
+    if(Array.isArray(logo.printColors)&&logo.printColors.length)logo.printColors.forEach(c=>colors.add(normalizeHex(c)));
+    else unknown=true;
+  });
+  if(unknown)return {label:'Kleuren: ?',status:'Van minstens één logo is het aantal drukkleuren onbekend. Vul het aantal zelf in voor een klantpreview.'};
+  if(!colors.size)return {label:'Geen bedrukking',status:'Voeg eerst een logo of tekst toe.'};
+  return {label:`${colors.size} drukkleur${colors.size===1?'':'en'}`,status:'Automatisch geteld uit omgezette logo’s en tekst. De spatlapkleur telt niet mee.'};
+}
+
+function topGuideOverlapCount(){
+  if(!state.ui?.topGuideOn)return 0;
+  const top=3;
+  return state.logos.filter(x=>x.y*state.flap.h-x.h/2<top).length+
+    state.texts.filter(t=>t.y*state.flap.h-t.size/2<top).length;
+}
+
+function printableTopCm(){return state.ui?.topGuideOn?Math.min(3,state.flap.h):0;}
+
+function verticalPlacement(itemHeightCm,position){
+  const h=state.flap.h,top=printableTopCm();
+  const half=Math.max(0,itemHeightCm/2);
+  const min=Math.min(h/2,top+half);
+  const max=Math.max(min,h-half);
+  if(position==='top')return min/h;
+  if(position==='bottom')return max/h;
+  return (min+max)/(2*h);
 }
 
 function render(){
@@ -1511,7 +3187,11 @@ function render(){
   }
   $('dimTop').textContent=`${w} cm`;$('dimLeft').textContent=`${h} cm`;
   const q=$('qtyBadge');
-  if(String(state.flap.qty).trim()){q.style.display='block';q.textContent=`Quantity: ${state.flap.qty}`;}else q.style.display='none';
+  if(String(state.flap.qty).trim()){q.style.display='block';q.textContent=`Aantal: ${state.flap.qty}`;}else q.style.display='none';
+  const colorInfo=colorCountInfo(),colorBadge=$('colorBadge');
+  colorBadge.textContent=colorInfo.label;
+  colorBadge.style.display=state.ui?.showColorCount?'block':'none';
+  $('colorCountStatus').textContent=colorInfo.status;
 
   flap.innerHTML='';
 
@@ -1548,7 +3228,7 @@ function render(){
     img.className='item logo-item'+(state.selected===x.id&&state.selectedType==='logo'?' selected':'')+(multiSelection.some(r=>r.id===x.id&&r.type==='logo')?' multi-selected':'');
     img.style.left=(x.x*100)+'%';img.style.top=(x.y*100)+'%';
     img.style.width=(x.w*s)+'px';img.style.height=(x.h*s)+'px';
-    bindDrag(img,x,'logo');img.onclick=e=>{e.stopPropagation();setSelected(x.id,'logo',e.shiftKey)};flap.appendChild(img);
+    bindDrag(img,x,'logo');img.onclick=e=>{e.stopPropagation();if(!suppressClickAfterDrag)setSelected(x.id,'logo',e.shiftKey)};flap.appendChild(img);
   });
   state.texts.forEach(t=>{
     const d=document.createElement('div');d.textContent=t.text;
@@ -1556,8 +3236,15 @@ function render(){
     d.style.left=(t.x*100)+'%';d.style.top=(t.y*100)+'%';d.style.fontSize=(t.size*s)+'px';d.style.color=t.color;
     d.style.fontFamily=t.font||'Arial, sans-serif';
     d.style.textAlign=t.align||'center';
-    bindDrag(d,t,'text');d.onclick=e=>{e.stopPropagation();setSelected(t.id,'text',e.shiftKey)};flap.appendChild(d);
+    bindDrag(d,t,'text');d.onclick=e=>{e.stopPropagation();if(!suppressClickAfterDrag)setSelected(t.id,'text',e.shiftKey)};flap.appendChild(d);
   });
+  if(state.ui?.topGuideOn){
+    const guide=document.createElement('div');guide.className='top-guide';
+    guide.style.height=(printableTopCm()/h*100)+'%';
+    flap.appendChild(guide);
+    const overlaps=topGuideOverlapCount();
+    $('topGuideStatus').textContent=overlaps?`${overlaps} onderdeel${overlaps===1?'':'en'} raakt of overlapt de strook.`:'Geen onderdelen in de strook.';
+  }else $('topGuideStatus').textContent='';
   renderLists();
   updateWideToolButtons();
   updateSelectionActionBar();
@@ -1566,28 +3253,40 @@ function render(){
 function bindDrag(el,obj,type){
   el.addEventListener('pointerdown',e=>{
     e.stopPropagation();
-    setSelected(obj.id,type,e.shiftKey);
     const rect=$('flap').getBoundingClientRect();
-    drag={obj,type,dx:e.clientX-(rect.left+obj.x*rect.width),dy:e.clientY-(rect.top+obj.y*rect.height),moved:false,snapshot:cloneState()};
+    const itemRect=el.getBoundingClientRect();
+    drag={obj,type,startClientX:e.clientX,startClientY:e.clientY,startX:obj.x,startY:obj.y,
+      halfX:Math.min(.5,itemRect.width/(2*rect.width)),halfY:Math.min(.5,itemRect.height/(2*rect.height)),
+      dx:e.clientX-(rect.left+obj.x*rect.width),dy:e.clientY-(rect.top+obj.y*rect.height),moved:false,snapshot:cloneState()};
     el.setPointerCapture(e.pointerId);
   });
   el.addEventListener('pointermove',e=>{
     if(!drag||drag.obj.id!==obj.id)return;
+    if(!drag.moved&&Math.hypot(e.clientX-drag.startClientX,e.clientY-drag.startClientY)<3)return;
+    if(!drag.moved){
+      drag.moved=true;state.selected=obj.id;state.selectedType=type;clearMultiSelection();
+      el.classList.add('selected');syncSelectionControls();renderLists();updateSelectionActionBar();
+    }
     const rect=$('flap').getBoundingClientRect();
-    obj.x=Math.max(0,Math.min(1,(e.clientX-drag.dx-rect.left)/rect.width));
-    obj.y=Math.max(0,Math.min(1,(e.clientY-drag.dy-rect.top)/rect.height));
-    drag.moved=true;
+    obj.x=Math.max(drag.halfX,Math.min(1-drag.halfX,(e.clientX-drag.dx-rect.left)/rect.width));
+    obj.y=Math.max(drag.halfY,Math.min(1-drag.halfY,(e.clientY-drag.dy-rect.top)/rect.height));
+    el.style.left=(obj.x*100)+'%';el.style.top=(obj.y*100)+'%';
     syncSelectionControls();
-    render();
   });
   el.addEventListener('pointerup',()=>{
-    if(drag&&drag.obj.id===obj.id&&drag.moved){history.push(drag.snapshot);if(history.length>50)history.shift();redoHistory=[];updateHistoryButtons();}
+    if(drag&&drag.obj.id===obj.id&&drag.moved){
+      suppressClickAfterDrag=true;setTimeout(()=>suppressClickAfterDrag=false,120);
+      history.push(drag.snapshot);if(history.length>50)history.shift();redoHistory=[];updateHistoryButtons();render();
+    }
     drag=null;
   });
-  el.addEventListener('pointercancel',()=>drag=null);
+  el.addEventListener('pointercancel',()=>{
+    if(drag&&drag.obj.id===obj.id&&drag.moved){obj.x=drag.startX;obj.y=drag.startY;render();}
+    drag=null;
+  });
 }
 
-$('flap').addEventListener('click',()=>{state.selected=null;state.selectedType=null;clearMultiSelection();syncSelectionControls();render();});
+$('flap').addEventListener('click',()=>{if(suppressClickAfterDrag)return;state.selected=null;state.selectedType=null;clearMultiSelection();syncSelectionControls();render();});
 
 function roundRectPath(ctx,x,y,w,h,rTL,rTR,rBR,rBL){
   const max=Math.min(w/2,h/2);rTL=Math.min(rTL,max);rTR=Math.min(rTR,max);rBR=Math.min(rBR,max);rBL=Math.min(rBL,max);
@@ -1648,7 +3347,7 @@ async function exportPNG(){
 
   const wrapRect=wrap.getBoundingClientRect();
   const flapRect=flap.getBoundingClientRect();
-  const scale=2;
+  const scale=Math.max(2,Math.min(4,1200/Math.max(1,wrapRect.width)));
 
   const c=document.createElement('canvas');
   c.width=Math.max(1,Math.round(wrapRect.width*scale));
@@ -1753,15 +3452,6 @@ async function exportPNG(){
         const ix=ox+x.x*fw-iw/2;
         const iy=oy+x.y*fh-ih/2;
         ctx.drawImage(img,ix,iy,iw,ih);
-
-        if(typeof isSelectedRef==='function' && isSelectedRef(x.id,'logo')){
-          ctx.save();
-          ctx.setLineDash([5,4]);
-          ctx.strokeStyle=(state.selected===x.id&&state.selectedType==='logo')?'#61a6ff':'#9d7cff';
-          ctx.lineWidth=2;
-          ctx.strokeRect(ix-4,iy-4,iw+8,ih+8);
-          ctx.restore();
-        }
         res();
       };
       img.onerror=res;
@@ -1783,19 +3473,14 @@ async function exportPNG(){
     if(t.align==='left')tx-=mw/2;
     if(t.align==='right')tx+=mw/2;
     ctx.fillText(t.text,tx,ty);
-
-    if(typeof isSelectedRef==='function' && isSelectedRef(t.id,'text')){
-      const boxH=fs*1.15;
-      const bx=ox+t.x*fw-mw/2;
-      const by=ty-boxH/2;
-      ctx.save();
-      ctx.setLineDash([5,4]);
-      ctx.strokeStyle=(state.selected===t.id&&state.selectedType==='text')?'#61a6ff':'#9d7cff';
-      ctx.lineWidth=2;
-      ctx.strokeRect(bx-4,by-4,mw+8,boxH+8);
-      ctx.restore();
-    }
   });
+
+  if(state.ui?.topGuideOn){
+    const guideH=Math.min(3,state.flap.h)*pxPerCmY;
+    ctx.fillStyle='rgba(255,169,64,.14)';ctx.fillRect(ox,oy,fw,guideH);
+    ctx.save();ctx.setLineDash([7,5]);ctx.strokeStyle='#ffb14f';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(ox,oy+guideH);ctx.lineTo(ox+fw,oy+guideH);ctx.stroke();ctx.restore();
+  }
 
   ctx.restore();
 
@@ -1826,11 +3511,11 @@ async function exportPNG(){
     ctx.restore();
   }
 
-  // Quantity badge at its live position.
-  const q=$('qtyBadge');
-  if(q && getComputedStyle(q).display!=='none'){
-    const r=q.getBoundingClientRect();
-    const st=getComputedStyle(q);
+  // Preview badges at their live positions.
+  for(const badge of [$('colorBadge'),$('qtyBadge')]){
+    if(!badge || getComputedStyle(badge).display==='none')continue;
+    const r=badge.getBoundingClientRect();
+    const st=getComputedStyle(badge);
     const x=r.left-wrapRect.left, y=r.top-wrapRect.top;
 
     ctx.fillStyle=st.backgroundColor||'#fff';
@@ -1843,7 +3528,7 @@ async function exportPNG(){
     ctx.font=`700 ${parseFloat(st.fontSize)||12}px Arial`;
     ctx.textAlign='center';
     ctx.textBaseline='middle';
-    ctx.fillText(q.textContent,x+r.width/2,y+r.height/2);
+    ctx.fillText(badge.textContent,x+r.width/2,y+r.height/2);
   }
 
   const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
@@ -1878,21 +3563,22 @@ async function exportPNG(){
   }
 }
 
-async function buildArtworkCanvas(scale=14){
+async function buildArtworkCanvas(scale=14,background=null){
   if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
   const W=Math.max(1,Math.round(state.flap.w*scale));
   const H=Math.max(1,Math.round(state.flap.h*scale));
   const c=document.createElement('canvas'); c.width=W; c.height=H;
   const ctx=c.getContext('2d');
+  if(background){ctx.fillStyle=background;ctx.fillRect(0,0,W,H);}
 
   for(const x of state.logos){
-    await new Promise(resolve=>{
+    await new Promise((resolve,reject)=>{
       const img=new Image();
       img.onload=()=>{
-        ctx.drawImage(img,x.x*W-x.w*scale/2,x.y*H-x.h*scale/2,x.w*scale,x.h*scale);
-        resolve();
+        try{ctx.drawImage(img,x.x*W-x.w*scale/2,x.y*H-x.h*scale/2,x.w*scale,x.h*scale);resolve();}
+        catch(err){reject(err);}
       };
-      img.onerror=resolve;
+      img.onerror=()=>reject(new Error(`Logo ${x.name||''} kon niet worden geladen`));
       img.src=x.src;
     });
   }
@@ -1911,21 +3597,35 @@ async function buildArtworkCanvas(scale=14){
   return c;
 }
 
-$('downloadArtworkPng').onclick=async()=>{
-  try{
-    const c=await buildArtworkCanvas();
+let imageFallbackUrl=null;
+$('copyBlackArtwork').onclick=async()=>{
+  const pngPromise=(async()=>{
+    const c=await buildArtworkCanvas(14,'#080808');
     const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
-    if(!blob) throw new Error('No PNG blob');
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.download=`artwork-${state.flap.w}x${state.flap.h}cm.png`;
-    a.href=url;
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
-    toast('Artwork PNG gemaakt');
+    if(!blob)throw new Error('Afbeelding maken mislukt');
+    return blob;
+  })();
+  try{
+    if(!navigator.clipboard?.write||!window.ClipboardItem)throw new Error('Klembord niet beschikbaar');
+    await navigator.clipboard.write([new ClipboardItem({'image/png':pngPromise})]);
+    $('imageFallbackLink').style.display='none';
+    $('pdfViewerImageFallback').style.display='none';
+    toast('Zwart artwork gekopieerd — plak het als afbeelding');
   }catch(err){
     console.error(err);
-    toast('Artwork PNG maken lukte niet');
+    try{
+      const blob=await pngPromise;
+      if(imageFallbackUrl)URL.revokeObjectURL(imageFallbackUrl);
+      imageFallbackUrl=URL.createObjectURL(blob);
+      const link=$('imageFallbackLink');
+      link.href=imageFallbackUrl;
+      link.download=`artwork-zwarte-achtergrond-${state.flap.w}x${state.flap.h}cm.png`;
+      link.style.display='inline-block';
+      const viewerLink=$('pdfViewerImageFallback');
+      viewerLink.href=imageFallbackUrl;viewerLink.download=link.download;
+      viewerLink.style.display=$('pdfViewer').classList.contains('open')?'inline-flex':'none';
+      toast('Kopiëren niet beschikbaar — downloadlink staat in het menu');
+    }catch(imageError){console.error(imageError);toast('Afbeelding maken lukte niet');}
   }
 };
 
@@ -1940,7 +3640,15 @@ function artworkSvgMarkup(){
   const parts=[`<svg xmlns="http://www.w3.org/2000/svg" width="${w}cm" height="${h}cm" viewBox="0 0 ${w} ${h}">`];
 
   state.logos.forEach(x=>{
-    parts.push(`<image href="${x.src}" x="${x.x*w-x.w/2}" y="${x.y*h-x.h/2}" width="${x.w}" height="${x.h}" preserveAspectRatio="none"/>`);
+    const left=x.x*w-x.w/2,top=x.y*h-x.h/2;
+    if(x.svgMarkup){
+      const doc=new DOMParser().parseFromString(x.svgMarkup,'image/svg+xml');
+      const root=doc.documentElement;
+      const viewBox=root.getAttribute('viewBox')||`0 0 ${parseFloat(root.getAttribute('width'))||1} ${parseFloat(root.getAttribute('height'))||1}`;
+      parts.push(`<svg x="${left}" y="${top}" width="${x.w}" height="${x.h}" viewBox="${escapeXml(viewBox)}" preserveAspectRatio="none">${root.innerHTML}</svg>`);
+    }else{
+      parts.push(`<image href="${x.src}" x="${left}" y="${top}" width="${x.w}" height="${x.h}" preserveAspectRatio="none"/>`);
+    }
   });
 
   state.texts.forEach(t=>{
@@ -1952,114 +3660,178 @@ function artworkSvgMarkup(){
   return parts.join('');
 }
 
+let jsPdfLoadPromise=null;
 function loadJsPdf(){
-  if(window.jspdf?.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
-
-  return new Promise((resolve,reject)=>{
+  if(window.jspdf?.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
+  if(jsPdfLoadPromise)return jsPdfLoadPromise;
+  jsPdfLoadPromise=new Promise((resolve,reject)=>{
     const existing=document.querySelector('script[data-jspdf-loader]');
-    if(existing){
-      if(window.jspdf?.jsPDF){
-        resolve(window.jspdf.jsPDF);
-        return;
-      }
-      existing.addEventListener('load',()=>resolve(window.jspdf?.jsPDF),{once:true});
-      existing.addEventListener('error',()=>reject(new Error('jsPDF laden mislukt')),{once:true});
-      return;
+    const script=existing||document.createElement('script');
+    let done=false;
+    const timer=setTimeout(()=>finish(new Error('PDF-bibliotheek laden duurde te lang')),20000);
+    function finish(error){
+      if(done)return;done=true;clearTimeout(timer);
+      if(error)reject(error);else resolve(window.jspdf.jsPDF);
     }
+    script.addEventListener('load',()=>window.jspdf?.jsPDF?finish():finish(new Error('PDF-bibliotheek niet beschikbaar')),{once:true});
+    script.addEventListener('error',()=>finish(new Error('PDF-bibliotheek laden mislukt')),{once:true});
+    if(!existing){
+      script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      script.async=true;script.dataset.jspdfLoader='1';
+      document.head.appendChild(script);
+    }
+  }).catch(err=>{
+    jsPdfLoadPromise=null;
+    document.querySelector('script[data-jspdf-loader]')?.remove();
+    throw err;
+  });
+  return jsPdfLoadPromise;
+}
 
+function loadSvgToPdf(){
+  if(window.jspdf?.jsPDF?.API?.svg)return Promise.resolve();
+  return new Promise((resolve,reject)=>{
     const script=document.createElement('script');
-    script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    script.async=true;
-    script.dataset.jspdfLoader='1';
-    script.onload=()=>{
-      if(window.jspdf?.jsPDF) resolve(window.jspdf.jsPDF);
-      else reject(new Error('jsPDF niet beschikbaar'));
-    };
-    script.onerror=()=>reject(new Error('jsPDF laden mislukt'));
+    script.src='https://cdn.jsdelivr.net/npm/svg2pdf.js@2.7.0/dist/svg2pdf.umd.min.js';
+    script.onload=()=>window.jspdf?.jsPDF?.API?.svg?resolve():reject(new Error('SVG-PDF bibliotheek niet beschikbaar'));
+    script.onerror=()=>reject(new Error('SVG-PDF bibliotheek laden mislukt'));
     document.head.appendChild(script);
   });
 }
 
-let currentPdfBlobUrl=null;
-
-$('downloadArtworkPdf').onclick=async()=>{
-  const btn=$('downloadArtworkPdf');
-  const link=$('pdfDownloadLink');
-  const oldLabel=btn.textContent;
-
+$('downloadVectorPdf').onclick=async()=>{
+  const btn=$('downloadVectorPdf'),oldLabel=btn.textContent;
+  btn.disabled=true;btn.textContent='Vector-PDF maken...';
   try{
-    btn.disabled=true;
-    btn.textContent='PDF maken...';
-
-    const jsPDF=await loadJsPdf();
-    if(!jsPDF) throw new Error('jsPDF niet geladen');
-
-    const canvas=await buildArtworkCanvas(14);
-    const png=canvas.toDataURL('image/png');
-
-    const widthMm=Number(state.flap.w)*10;
-    const heightMm=Number(state.flap.h)*10;
-    const orientation=widthMm>=heightMm?'landscape':'portrait';
-
-    const pdf=new jsPDF({
-      orientation,
-      unit:'mm',
-      format:[widthMm,heightMm],
-      compress:true,
-      putOnlyUsedFonts:true
-    });
-
-    pdf.addImage(
-      png,
-      'PNG',
-      0,
-      0,
-      widthMm,
-      heightMm,
-      undefined,
-      'FAST'
-    );
-
-    // Build a real PDF Blob instead of relying only on jsPDF.save().
-    const blob=pdf.output('blob');
-
-    if(currentPdfBlobUrl){
-      try{URL.revokeObjectURL(currentPdfBlobUrl);}catch(e){}
+    if(state.logos.some(logo=>!logo.svgMarkup))throw new Error('Zet alle PNG/JPG-logo’s eerst om naar vector');
+    const jsPDF=await loadJsPdf();await loadSvgToPdf();
+    const widthMm=Number(state.flap.w)*10,heightMm=Number(state.flap.h)*10;
+    const pdf=new jsPDF({orientation:widthMm>=heightMm?'landscape':'portrait',unit:'mm',format:[widthMm,heightMm],compress:true});
+    const doc=new DOMParser().parseFromString(artworkSvgMarkup(),'image/svg+xml');
+    if(doc.querySelector('parsererror'))throw new Error('Artwork SVG ongeldig');
+    await pdf.svg(doc.documentElement,{x:0,y:0,width:widthMm,height:heightMm});
+    pdf.addPage('a4','portrait');
+    pdf.setFontSize(18);pdf.text('Artwork en kleuren',20,25);
+    pdf.setFontSize(11);
+    pdf.text(`Formaat: ${state.flap.w} x ${state.flap.h} cm`,20,39);
+    const colorLabel=colorCountInfo().label;
+    pdf.text(colorLabel.startsWith('Kleuren:')?colorLabel:`Kleuren: ${colorLabel}`,20,47);
+    let y=59;
+    for(const logo of state.logos){
+      const colors=logo.printColors;
+      const label=colors?`${logo.name}: ${colors.length} kleuren (${colors.join(', ')})`:`${logo.name}: kleuren niet automatisch vastgesteld`;
+      const rows=pdf.splitTextToSize(label,170);pdf.text(rows,20,y);y+=rows.length*6+3;
+      if(y>255){pdf.addPage('a4','portrait');y=20;}
     }
-    currentPdfBlobUrl=URL.createObjectURL(blob);
+    for(const t of state.texts){
+      const rows=pdf.splitTextToSize(`Tekst: ${t.color||'#FFFFFF'}`,170);pdf.text(rows,20,y);y+=rows.length*6+3;
+      if(y>255){pdf.addPage('a4','portrait');y=20;}
+    }
+    pdf.setFontSize(9);pdf.text('Controleer lettertypen en drukgeschiktheid voordat je dit bestand voor productie gebruikt.',20,280);
+    pdf.save(`artwork-vector-${state.flap.w}x${state.flap.h}cm.pdf`);
+    toast('Vector-PDF gemaakt');
+  }catch(err){console.error(err);toast(err.message||'Vector-PDF maken lukte niet');}
+  finally{btn.disabled=false;btn.textContent=oldLabel;}
+};
 
-    const filename=`artwork-${state.flap.w}x${state.flap.h}cm.pdf`;
-    link.href=currentPdfBlobUrl;
-    link.download=filename;
-    link.textContent=`PDF klaar — download ${filename}`;
-    link.style.display='inline-block';
+const pdfBlobUrls=[];
 
-    // Try automatic download once, but keep the visible link as fallback.
-    try{
-      const a=document.createElement('a');
-      a.href=currentPdfBlobUrl;
-      a.download=filename;
-      a.style.display='none';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }catch(e){}
+async function makeArtworkPdfBlob(background=null){
+  const jsPDF=await loadJsPdf();
+  if(!jsPDF)throw new Error('PDF-bibliotheek niet geladen');
+  const canvas=await buildArtworkCanvas(14,background);
+  const widthMm=Number(state.flap.w)*10,heightMm=Number(state.flap.h)*10;
+  const pdf=new jsPDF({
+    orientation:widthMm>=heightMm?'landscape':'portrait',
+    unit:'mm',format:[widthMm,heightMm],compress:true,putOnlyUsedFonts:true
+  });
+  pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,widthMm,heightMm,undefined,'FAST');
+  return pdf.output('blob');
+}
 
-    toast('PDF gemaakt · gebruik de downloadlink als hij niet automatisch verschijnt');
+function showPdfLinks(blob,filename){
+  const url=URL.createObjectURL(blob);
+  pdfBlobUrls.push(url);
+  while(pdfBlobUrls.length>6)URL.revokeObjectURL(pdfBlobUrls.shift());
+  const view=$('pdfViewLink'),download=$('pdfDownloadLink');
+  view.href=url;view.textContent=`Bekijk ${filename}`;view.style.display='inline-block';
+  download.href=url;download.download=filename;
+  download.textContent=`PDF klaar — download ${filename}`;download.style.display='inline-block';
+  return url;
+}
+
+function showPdfViewer(url,filename){
+  $('pdfViewerFrame').src=url;
+  $('pdfViewerImageFallback').style.display='none';
+  $('pdfViewerOpenTab').href=url;
+  $('pdfViewerDownload').href=url;
+  $('pdfViewerDownload').download=filename;
+  $('pdfViewer').classList.add('open');
+  $('pdfViewerClose').focus();
+}
+function closePdfViewer(){
+  $('pdfViewer').classList.remove('open');
+  $('pdfViewerFrame').src='about:blank';
+}
+$('pdfViewerClose').onclick=closePdfViewer;
+$('pdfViewerCopy').onclick=()=>$('copyBlackArtwork').click();
+$('pdfViewer').addEventListener('click',e=>{if(e.target===$('pdfViewer'))closePdfViewer();});
+
+function triggerPdfDownload(url,filename){
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.style.display='none';
+  document.body.appendChild(a);a.click();a.remove();
+}
+
+async function blackPdfAction(mode){
+  const btn=$(mode==='view'?'viewBlackPdf':'downloadBlackPdf');
+  const oldLabel=btn.textContent;
+  $('pdfViewLink').style.display='none';$('pdfDownloadLink').style.display='none';
+  btn.disabled=true;btn.textContent='PDF maken...';
+  try{
+    const blob=await makeArtworkPdfBlob('#080808');
+    const filename=`artwork-zwarte-achtergrond-${state.flap.w}x${state.flap.h}cm.pdf`;
+    const url=showPdfLinks(blob,filename);
+    if(mode==='view'){
+      showPdfViewer(url,filename);
+    }else{
+      try{triggerPdfDownload(url,filename);toast('PDF met zwarte achtergrond gedownload');}
+      catch(e){$('downloadMenu').open=true;toast('PDF klaar — klik op de downloadlink in Download');}
+    }
   }catch(err){
     console.error(err);
-    link.style.display='none';
-    toast('PDF maken lukte niet');
-  }finally{
-    btn.disabled=false;
-    btn.textContent=oldLabel;
-  }
+    toast('PDF met zwarte achtergrond maken lukte niet');
+  }finally{btn.disabled=false;btn.textContent=oldLabel;}
+}
+$('viewBlackPdf').onclick=()=>blackPdfAction('view');
+$('downloadBlackPdf').onclick=()=>blackPdfAction('download');
+$('quickBlackPdf').onclick=()=>$('viewBlackPdf').click();
+
+$('downloadArtworkPdf').onclick=async()=>{
+  const btn=$('downloadArtworkPdf'),oldLabel=btn.textContent;
+  $('pdfViewLink').style.display='none';$('pdfDownloadLink').style.display='none';
+  btn.disabled=true;btn.textContent='PDF maken...';
+  try{
+    const blob=await makeArtworkPdfBlob();
+    const filename=`artwork-zonder-achtergrond-${state.flap.w}x${state.flap.h}cm.pdf`;
+    const url=showPdfLinks(blob,filename);
+    try{triggerPdfDownload(url,filename);toast('Artwork PDF gedownload');}
+    catch(e){$('downloadMenu').open=true;toast('PDF klaar — klik op de downloadlink in Download');}
+  }catch(err){console.error(err);toast('Artwork PDF maken lukte niet');}
+  finally{btn.disabled=false;btn.textContent=oldLabel;}
 };
 
 $('download').onclick=exportPNG;
 
 function encodeShareState(){
-  const compact={f:state.flap,h:state.holes,l:state.logos,t:state.texts,u:state.ui};
+  const logos=state.logos.map(logo=>{
+    const copy={...logo};
+    if(copy.svgMarkup){
+      delete copy.src;delete copy.originalRasterSrc;delete copy.vectorCrop;
+    }
+    return copy;
+  });
+  const compact={f:state.flap,h:state.holes,l:logos,t:state.texts,u:state.ui};
   return btoa(unescape(encodeURIComponent(JSON.stringify(compact))))
     .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
@@ -2133,13 +3905,151 @@ function currentShareUrl(){
   const encoded=encodeShareState();
   return location.href.split(/[?#]/)[0]+'#design='+encoded;
 }
+let currentLocalDesignId=null;
+let localDbPromise=null;
+const localStoragePrefix='spatlap-preview-design-';
+function openLocalDb(){
+  if(!localDbPromise)localDbPromise=new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('Browseropslag niet beschikbaar'));return;}
+    const request=indexedDB.open('spatlap-preview-designs',1);
+    request.onupgradeneeded=()=>request.result.createObjectStore('designs',{keyPath:'id'});
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error||new Error('Browseropslag niet beschikbaar'));
+    request.onblocked=()=>reject(new Error('Browseropslag is geblokkeerd'));
+  });
+  return localDbPromise;
+}
+async function writeLocalDesign(record){
+  try{
+    const db=await openLocalDb();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction('designs','readwrite');
+      tx.objectStore('designs').put(record);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+      tx.onabort=()=>reject(tx.error);
+    });
+  }catch(dbError){
+    try{localStorage.setItem(localStoragePrefix+record.id,JSON.stringify(record));}
+    catch(storageError){throw new Error('Browseropslag niet beschikbaar of vol');}
+  }
+}
+async function readLocalDesign(id){
+  try{
+    const db=await openLocalDb();
+    const record=await new Promise((resolve,reject)=>{
+      const tx=db.transaction('designs','readonly');
+      const request=tx.objectStore('designs').get(id);
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error);
+    });
+    if(record)return record;
+  }catch(e){}
+  try{return JSON.parse(localStorage.getItem(localStoragePrefix+id)||'null');}catch(e){return null;}
+}
+async function allLocalDesigns(){
+  const records=new Map();
+  try{
+    const db=await openLocalDb();
+    const list=await new Promise((resolve,reject)=>{
+      const tx=db.transaction('designs','readonly');
+      const request=tx.objectStore('designs').getAll();
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error);
+    });
+    for(const record of list)records.set(record.id,record);
+  }catch(e){}
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      if(!key?.startsWith(localStoragePrefix))continue;
+      const record=JSON.parse(localStorage.getItem(key));
+      if(record?.id&&(!records.has(record.id)||record.updatedAt>records.get(record.id).updatedAt))records.set(record.id,record);
+    }
+  }catch(e){}
+  return [...records.values()].sort((a,b)=>b.updatedAt-a.updatedAt);
+}
+function localDesignUrl(id){return location.href.split(/[?#]/)[0]+'#local='+encodeURIComponent(id);}
+function showLocalLink(id,message){
+  const status=$('shareStatus');status.replaceChildren();
+  status.append(document.createTextNode(message+' '));
+  const link=document.createElement('a');link.href=localDesignUrl(id);link.textContent='Korte link openen';
+  status.append(link);
+}
+function compactDesignState(){return {f:state.flap,h:state.holes,l:state.logos,t:state.texts,u:state.ui};}
+async function saveCurrentLocally(){
+  const id=currentLocalDesignId||(crypto.randomUUID?.()||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)));
+  const name=$('localDesignName').value.trim()||`Ontwerp ${new Date().toLocaleString('nl-NL')}`;
+  const record={id,name,updatedAt:Date.now(),payload:JSON.parse(JSON.stringify(compactDesignState()))};
+  await writeLocalDesign(record);
+  currentLocalDesignId=id;
+  $('localDesignName').value=name;
+  location.hash='local='+encodeURIComponent(id);
+  await renderSavedDesigns();
+  return id;
+}
+async function renderSavedDesigns(){
+  const box=$('savedDesigns');box.replaceChildren();
+  const designs=await allLocalDesigns();
+  if(!designs.length){box.textContent='Nog geen lokaal bewaarde ontwerpen.';return;}
+  for(const record of designs){
+    const row=document.createElement('div');row.className='list-item';
+    const label=document.createElement('span');label.textContent=`${record.name} · ${new Date(record.updatedAt).toLocaleString('nl-NL')}`;
+    const button=document.createElement('button');button.type='button';button.textContent='Openen';
+    button.onclick=()=>openSavedDesign(record.id);
+    row.append(label,button);box.append(row);
+  }
+}
+async function openSavedDesign(id){
+  const record=await readLocalDesign(id);
+  if(!record?.payload||!applyCompactState(record.payload)){
+    $('shareStatus').textContent='Dit ontwerp is niet meer aanwezig in deze browser.';return false;
+  }
+  currentLocalDesignId=id;
+  $('localDesignName').value=record.name||'';
+  location.hash='local='+encodeURIComponent(id);
+  $('shareStatus').textContent='Lokaal ontwerp geopend.';
+  return true;
+}
+$('saveLocal').onclick=async()=>{
+  try{const id=await saveCurrentLocally();showLocalLink(id,'Ontwerp bewaard in deze browser.');toast('Ontwerp bewaard');}
+  catch(err){$('shareStatus').textContent=err.message||'Bewaren lukte niet in deze browser.';}
+};
+$('headerSave').onclick=()=>$('saveLocal').click();
+$('headerLink').onclick=()=>$('copyLocalUrl').click();
+document.addEventListener('pointerdown',event=>{
+  const menu=$('downloadMenu');
+  if(menu.open&&!menu.contains(event.target))menu.open=false;
+});
+$('copyLocalUrl').onclick=async()=>{
+  let id;
+  try{id=await saveCurrentLocally();}
+  catch(err){$('shareStatus').textContent=err.message||'Bewaren lukte niet in deze browser.';return;}
+  try{
+    await navigator.clipboard.writeText(localDesignUrl(id));
+    $('shareStatus').textContent='Korte lokale link gekopieerd. Deze werkt alleen hier in deze browser.';
+    toast('Korte link gekopieerd');
+  }catch(err){showLocalLink(id,'Ontwerp bewaard, maar kopiëren lukte niet.');}
+};
 $('openCopy').onclick=()=>{
   try{
     const url=currentShareUrl();
-    window.open(url,'_blank','noopener');
-    toast('Kopie geopend in nieuw tabblad');
+    if(url.length>180000){
+      $('shareStatus').textContent='Deelbare link te groot door de logo-bestanden. Gebruik kleinere logo’s om een kopie te openen.';
+      return;
+    }
+    const status=$('shareStatus');
+    status.replaceChildren();
+    const link=document.createElement('a');
+    link.href=url;
+    link.target='_blank';
+    link.rel='noopener';
+    link.textContent='Open deelbare kopie in een nieuw tabblad';
+    status.append(link);
+    const opened=window.open(url,'_blank');
+    if(opened){opened.opener=null;toast('Kopie geopend in nieuw tabblad');}
+    else toast('Klik op de link om de kopie te openen');
   }catch(e){
-    toast('Openen lukte niet');
+    $('shareStatus').textContent='Openen lukte niet. Probeer de deelbare link te kopiëren.';
   }
 };
 
@@ -2147,7 +4057,7 @@ $('copyUrl').onclick=async()=>{
   try{
     const url=currentShareUrl();
     if(url.length>180000){
-      $('shareStatus').textContent='De link is erg groot door de logo-bestanden. Gebruik liever de PNG of kleinere logo’s.';
+      $('shareStatus').textContent='Deelbare link te groot door de logo-bestanden. Bewaar het ontwerp lokaal voor een korte link, of gebruik kleinere logo’s om te delen.';
       return;
     }
     await navigator.clipboard.writeText(url);
@@ -2219,11 +4129,29 @@ function loadFromQuery(){
   return true;
 }
 
+function applyCompactState(x){
+  if(!x||!x.f||!x.h||!Array.isArray(x.l||[])||!Array.isArray(x.t||[]))return false;
+  state.flap=x.f;
+  if(state.flap.shape==='tapered')state.flap.shape='shoulder';
+  if(state.flap.shoulderInset==null)state.flap.shoulderInset=5;
+  if(state.flap.shoulderTopH==null)state.flap.shoulderTopH=5;
+  state.holes=x.h;state.logos=x.l||[];
+  state.logos.forEach(l=>{
+    if(!l.ratio||!isFinite(l.ratio)||l.ratio<=0)l.ratio=(l.w/l.h)||1;
+    if(l.svgMarkup&&!l.src)l.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(l.svgMarkup);
+  });
+  state.texts=x.t||[];state.ui=x.u||{wideMode:false,zones:true,zoneSide:15};
+  if(state.ui.wideMode==null)state.ui.wideMode=false;
+  if(state.ui.zoneSide==null)state.ui.zoneSide=15;
+  state.selected=null;state.selectedType=null;clearMultiSelection();
+  history=[];redoHistory=[];updateHistoryButtons();
+  syncUIFromState();render();return true;
+}
 function loadFromHash(){
   if(!location.hash.startsWith('#design='))return false;
   try{
     const x=decodeShareState(location.hash.slice(8));
-    if(x.f&&x.h){state.flap=x.f;if(state.flap.shape==='tapered')state.flap.shape='shoulder';if(state.flap.shoulderInset==null)state.flap.shoulderInset=5;if(state.flap.shoulderTopH==null)state.flap.shoulderTopH=5;state.holes=x.h;state.logos=x.l||[];state.logos.forEach(l=>{if(!l.ratio||!isFinite(l.ratio)||l.ratio<=0)l.ratio=(l.w/l.h)||1;});state.texts=x.t||[];state.ui=x.u||{wideMode:false,zones:true,zoneSide:15};if(state.ui.wideMode==null)state.ui.wideMode=false;if(state.ui.zoneSide==null)state.ui.zoneSide=15;state.selected=null;state.selectedType=null;clearMultiSelection();syncUIFromState();render();return true;}
+    if(applyCompactState(x)){currentLocalDesignId=null;$('localDesignName').value='';return true;}
   }catch(e){}
   return false;
 }
@@ -2236,10 +4164,12 @@ $('resetModal').addEventListener('click',e=>{
 $('confirmReset').onclick=()=>{
   $('resetModal').classList.remove('open');
   pushHistory();
+  currentLocalDesignId=null;$('localDesignName').value='';
+  if(location.hash)location.hash='';
   state={logos:[],texts:[],selected:null,selectedType:null,
     flap:{w:190,h:25,qty:'',shape:'square',radius:5,shoulderInset:5,shoulderTopH:5,color:'#080808'},
     holes:{on:true,count:6,shape:'round',top:3,side:10,h:1.2,w:2.2},
-    ui:{wideMode:false,zones:true,zoneCenter:50}};
+    ui:{wideMode:false,zones:true,zoneCenter:50,topGuideOn:false,showColorCount:false,manualColorCount:''}};
   syncUIFromState();render();
   toast('Nieuw ontwerp gestart');
 };
@@ -2253,11 +4183,18 @@ document.addEventListener('wheel',e=>{
 },{passive:false});
 
 window.addEventListener('resize',render);
-syncUIFromState();
-if(!loadFromHash()){
-  if(!loadFromQuery())render();
+async function initDesign(){
+  syncUIFromState();
+  let loaded=false;
+  if(location.hash.startsWith('#local=')){
+    try{loaded=await openSavedDesign(decodeURIComponent(location.hash.slice(7)));}
+    catch(e){$('shareStatus').textContent='Lokaal ontwerp openen lukte niet.';}
+  }else loaded=loadFromHash();
+  if(!loaded&&!loadFromQuery())render();
+  await renderSavedDesigns();
+  updateHistoryButtons();
 }
-updateHistoryButtons();
+initDesign();
 </script>
 
 </body>
