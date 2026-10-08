@@ -57,9 +57,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
 .preview-wrap{
   position:relative;background:#e9edf2;border-radius:10px;min-height:520px;
-  overflow:hidden;display:flex;align-items:center;justify-content:center;padding:75px;
+  overflow:auto;display:flex;align-items:flex-start;justify-content:flex-start;padding:75px;
   transition:background .2s ease;max-width:100%;min-width:0
 }
+.preview-shell{position:relative}
+.zoom-controls{position:absolute;top:10px;right:10px;z-index:20;display:flex;align-items:center;gap:4px;padding:4px;background:#171d26;border:1px solid #485667;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.25)}
+.zoom-controls button{width:32px;height:32px;padding:0;font-size:20px;line-height:1}
+.zoom-controls output{min-width:50px;text-align:center;font-size:12px;font-weight:700;color:#fff}
 .preview-wrap.white-flap-bg{background:#3a4049}
 .wide-tools-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .wide-tools-body.open{display:block}
@@ -68,7 +72,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .zone-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
 .zone-buttons button{padding:8px 6px}
 
-#stage{position:relative;transform-origin:center center}
+#stage{position:relative;flex:none;margin:auto}
 #flap{
   position:relative;background:#080808;box-shadow:0 10px 30px rgba(0,0,0,.24);
   overflow:hidden;border:1px solid rgba(255,255,255,.04)
@@ -420,6 +424,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
   .sidebar{order:2;padding:10px 8px 16px}
   .canvas-card{min-height:0;padding:calc(var(--mobile-preview-h) + 12px) 9px 12px}
   .preview-wrap{position:fixed;top:var(--mobile-header-h);left:0;right:0;width:100%;height:var(--mobile-preview-h);min-height:0;padding:20px 34px 30px;border-radius:0;border-bottom:2px solid #354355;z-index:90;box-shadow:0 8px 22px rgba(0,0,0,.32)}
+  .zoom-controls{position:fixed;top:calc(var(--mobile-header-h) + 7px);right:7px;z-index:95}
   .toolbar{margin-bottom:10px}
   .toolbar .hint{font-size:11px}
   .dim{font-size:11px}
@@ -797,12 +802,19 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
         </div>
         <button id="quickBlackPdf" type="button">Bekijk zwarte PDF</button>
       </div>
-      <div class="preview-wrap" id="previewWrap">
-        <div id="stage">
-          <div class="dim top" id="dimTop">190 cm</div>
-          <div class="dim left" id="dimLeft">25 cm</div>
-          <div class="preview-badges"><div class="color-badge" id="colorBadge"></div><div class="qty" id="qtyBadge"></div></div>
-          <div id="flap"></div>
+      <div class="preview-shell">
+        <div class="preview-wrap" id="previewWrap">
+          <div id="stage">
+            <div class="dim top" id="dimTop">190 cm</div>
+            <div class="dim left" id="dimLeft">25 cm</div>
+            <div class="preview-badges"><div class="color-badge" id="colorBadge"></div><div class="qty" id="qtyBadge"></div></div>
+            <div id="flap"></div>
+          </div>
+        </div>
+        <div class="zoom-controls" aria-label="Voorvertoning inzoomen">
+          <button id="zoomOut" type="button" aria-label="Uitzoomen" title="Uitzoomen (Ctrl/⌘ −)">−</button>
+          <output id="zoomLevel" title="Klik om passend te maken">100%</output>
+          <button id="zoomIn" type="button" aria-label="Inzoomen" title="Inzoomen (Ctrl/⌘ +)">+</button>
         </div>
       </div>
 
@@ -953,6 +965,7 @@ let drag=null;
 let suppressClickAfterDrag=false;
 let multiSelection=[]; // array of {id,type}; primary selection remains state.selected/state.selectedType
 let internalClipboard=[];
+let previewZoom=1;
 
 function cloneState(){
   return JSON.parse(JSON.stringify(state));
@@ -1012,8 +1025,31 @@ function scaleFactor(){
   const availableH=wrap ? Math.max(phone?40:180,wrap.clientHeight-(phone?70:150)) : 360;
   const maxW=Math.min(980,availableW);
   const maxH=Math.min(360,availableH);
-  return Math.max(.1,Math.min(maxW/w,maxH/h));
+  return Math.max(.1,Math.min(maxW/w,maxH/h))*previewZoom;
 }
+function setPreviewZoom(value,clientX,clientY){
+  const wrap=$('previewWrap'),stage=$('stage');
+  const before=stage.getBoundingClientRect(),box=wrap.getBoundingClientRect();
+  const x=clientX??box.left+box.width/2,y=clientY??box.top+box.height/2;
+  const fractionX=before.width?(x-before.left)/before.width:.5;
+  const fractionY=before.height?(y-before.top)/before.height:.5;
+  const next=Math.max(.5,Math.min(8,Math.round(value*100)/100));
+  if(next===previewZoom)return;
+  previewZoom=next;
+  render();
+  $('zoomLevel').textContent=Math.round(previewZoom*100)+'%';
+  const after=stage.getBoundingClientRect();
+  wrap.scrollLeft+=after.left+fractionX*after.width-x;
+  wrap.scrollTop+=after.top+fractionY*after.height-y;
+}
+$('zoomIn').onclick=()=>setPreviewZoom(previewZoom*1.25);
+$('zoomOut').onclick=()=>setPreviewZoom(previewZoom/1.25);
+$('zoomLevel').onclick=()=>setPreviewZoom(1);
+$('previewWrap').addEventListener('wheel',event=>{
+  if(!event.ctrlKey&&!event.metaKey)return;
+  event.preventDefault();
+  setPreviewZoom(previewZoom*(event.deltaY<0?1.15:1/1.15),event.clientX,event.clientY);
+},{passive:false});
 function readBaseControls(){
   state.flap.w=Math.max(10,Number($('w').value)||190);
   state.flap.h=Math.max(5,Number($('h').value)||25);
@@ -1369,11 +1405,11 @@ $('pasteLogo').onclick=async()=>{
   }
 };
 
-async function vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold){
+async function vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold,maxSideOverride=0){
   const img=new Image();
   img.src=logo.originalRasterSrc||logo.src;
   await img.decode();
-  const maxSide=edgeStyle==='detail'?500:400,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+  const maxSide=maxSideOverride||(edgeStyle==='detail'?500:400),scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
   const w=Math.max(1,Math.round(img.naturalWidth*scale));
   const h=Math.max(1,Math.round(img.naturalHeight*scale));
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
@@ -1594,12 +1630,12 @@ $('whitePngVector').onclick=async()=>{
     $('vectorAlphaThreshold').value=String(maskThreshold);
     $('vectorWhiteCutout').checked=false;
     scheduleVectorPreview();
-    await $('vectorizeLogo').onclick();
+    await $('vectorizeLogo').onclick({maxSide:1000});
   }catch(err){$('vectorStatus').textContent=`PNG openen lukte niet: ${err.message||'probeer opnieuw'}`;}
   finally{btn.disabled=false;}
 };
 
-$('vectorizeLogo').onclick=async()=>{
+$('vectorizeLogo').onclick=async(options={})=>{
   const logo=itemById(state.selected,'logo');
   if(!logo){$('vectorStatus').textContent='Selecteer eerst een logo.';return;}
   if(logo.svgMarkup&&!logo.originalRasterSrc){$('vectorStatus').textContent='Dit SVG-logo is al vector. Upload de originele PNG/JPG om kleuren te beperken.';return;}
@@ -1611,7 +1647,7 @@ $('vectorizeLogo').onclick=async()=>{
   const alphaThreshold=Math.max(1,Math.min(255,Math.round(Number($('vectorAlphaThreshold').value)||1)));
   const btn=$('vectorizeLogo');btn.disabled=true;$('vectorStatus').textContent='Logo omzetten...';
   try{
-    const result=await vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold);
+    const result=await vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,lightThreshold,alphaThreshold,options.maxSide);
     pushHistory();
     if(!logo.originalRasterSrc)logo.originalRasterSrc=logo.src;
     const old=logo.vectorCrop||{x:0,y:0,w:1,h:1};
@@ -1882,6 +1918,13 @@ document.addEventListener('keydown',e=>{
   const typing=tag==='input' || tag==='textarea' || tag==='select' || editable;
   const mod=e.ctrlKey || e.metaKey;
   const key=e.key.toLowerCase();
+
+  if(!typing&&mod&&['+','=','add','-','_','subtract','0'].includes(key)){
+    e.preventDefault();
+    if(key==='0')setPreviewZoom(1);
+    else setPreviewZoom(previewZoom*(['+','=','add'].includes(key)?1.25:1/1.25));
+    return;
+  }
 
   // Standard editor shortcuts only when not typing in a field.
   if(!typing && mod && key==='c'){
