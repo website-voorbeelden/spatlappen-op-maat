@@ -40,3 +40,7 @@ Het afzenderdomein `spatlappenopmaat.nl` moet in Resend zijn geverifieerd.
 - Offerteformulier met optionele bijlage tot 4 MB
 - Resend-mail via Cloudflare Pages Functions
 - Security- en cacheheaders voor Cloudflare Pages
+
+## Spatlap Preview Tool koppelen aan een later CRM
+
+De previewtool heeft een kleine, versiegebonden JavaScript-koppeling voor het uitwisselen van volledige ontwerpen. Zie [docs/spatlap-preview-integratie.md](docs/spatlap-preview-integratie.md) voor het formaat en de functies. Er is nog geen database, login of centrale opslag ingebouwd.
