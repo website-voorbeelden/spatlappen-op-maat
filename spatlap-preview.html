@@ -826,8 +826,6 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div class="subcard">
             <div class="subcard-title">Geselecteerde afbeelding naar vector omzetten</div>
             <div id="vectorTarget" class="field-help">Selecteer een PNG, JPG of WebP in de preview. Deze omzetting geldt voor die afbeelding; de drukkleuren hierboven gelden voor het hele ontwerp.</div>
-            <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Transparante PNG → witte vector</button></div>
-            <div class="field-help">Selecteer een transparante PNG en klik op deze knop. De zichtbare pixels worden wit; de transparante achtergrond blijft weg.</div>
             <div class="row" style="margin-top:9px">
               <div><label for="vectorLightThreshold">Lichtgrens <output id="vectorLightValue">170</output></label><input id="vectorLightThreshold" type="range" min="0" max="255" value="170"></div>
               <div><label for="vectorAlphaThreshold">Transparantiegrens <output id="vectorAlphaValue">64</output></label><input id="vectorAlphaThreshold" type="range" min="1" max="255" value="64"></div>
@@ -838,6 +836,8 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <div><strong>Resultaat</strong><div class="vector-preview-tile"><img id="vectorResultPreview" alt="Voorbeeld van vectoromzetting"></div></div>
             </div>
             <div id="vectorPreviewStatus" class="field-help">Selecteer een afbeelding om het resultaat te bekijken.</div>
+            <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Transparante PNG → witte vector</button></div>
+            <div class="field-help">Deze knop gebruikt de transparantiegrens hierboven en maakt alle zichtbare delen wit. De lichtgrens geldt alleen voor afbeeldingen zonder transparante achtergrond.</div>
             <div class="row" style="margin-top:9px">
               <div><label>Max. kleuren in deze afbeelding</label><input id="vectorColorCount" type="number" min="1" max="8" value="1"></div>
               <div><label>Kleur bij 1 kleur</label><input id="vectorSingleColor" type="color" value="#ffffff"></div>
@@ -1566,7 +1566,6 @@ $('whitePngVector').onclick=async()=>{
     }
     $('vectorColorCount').value='1';
     $('vectorSingleColor').value='#ffffff';
-    $('vectorAlphaThreshold').value='64';
     $('vectorWhiteCutout').checked=false;
     scheduleVectorPreview();
     await $('vectorizeLogo').onclick();
