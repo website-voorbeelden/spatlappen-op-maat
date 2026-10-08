@@ -1520,7 +1520,11 @@ function pngMaskThreshold(rgba){
     if(score>bestScore){bestScore=score;split=a;}
   }
   // Alpha 1 often represents export noise, not printable artwork.
-  return Math.max(64,Math.min(255,split+1));
+  const threshold=Math.max(64,Math.min(255,split+1));
+  let visible=0;
+  for(let a=threshold;a<256;a++)visible+=histogram[a];
+  if(visible>total*.95)return null;
+  return threshold;
 }
 
 let vectorPreviewTimer,vectorPreviewToken=0,vectorPreviewLogoId=null,vectorPreviewSource=null,vectorPreviewSettings='';
