@@ -836,8 +836,8 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <div><strong>Resultaat</strong><div class="vector-preview-tile"><img id="vectorResultPreview" alt="Voorbeeld van vectoromzetting"></div></div>
             </div>
             <div id="vectorPreviewStatus" class="field-help">Selecteer een afbeelding om het resultaat te bekijken.</div>
-            <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Transparante PNG → witte vector</button></div>
-            <div class="field-help">Deze knop gebruikt de transparantiegrens hierboven en maakt alle zichtbare delen wit. De lichtgrens geldt alleen voor afbeeldingen zonder transparante achtergrond.</div>
+            <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Zichtbare PNG-pixels → witte vector</button></div>
+            <div class="field-help">Deze knop neemt iedere pixel mee die niet volledig transparant is en maakt die wit. Hij zet de transparantiegrens op 1. Ontstaat er randruis? Zet de grens iets hoger en gebruik de gewone vectorknop. De lichtgrens geldt alleen voor afbeeldingen zonder transparante achtergrond.</div>
             <div class="row" style="margin-top:9px">
               <div><label>Max. kleuren in deze afbeelding</label><input id="vectorColorCount" type="number" min="1" max="8" value="1"></div>
               <div><label>Kleur bij 1 kleur</label><input id="vectorSingleColor" type="color" value="#ffffff"></div>
@@ -1559,13 +1559,14 @@ $('whitePngVector').onclick=async()=>{
     context.drawImage(img,0,0,canvas.width,canvas.height);
     const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
     let transparent=0;
-    for(let i=3;i<pixels.length;i+=4)if(pixels[i]<64)transparent++;
+    for(let i=3;i<pixels.length;i+=4)if(pixels[i]===0)transparent++;
     if(transparent<canvas.width*canvas.height*.005){
       $('vectorStatus').textContent='Deze PNG heeft geen duidelijke transparante achtergrond. Gebruik de gewone vectorinstellingen om een achtergrond weg te laten.';
       return;
     }
     $('vectorColorCount').value='1';
     $('vectorSingleColor').value='#ffffff';
+    $('vectorAlphaThreshold').value='1';
     $('vectorWhiteCutout').checked=false;
     scheduleVectorPreview();
     await $('vectorizeLogo').onclick();
