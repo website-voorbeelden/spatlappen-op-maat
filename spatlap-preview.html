@@ -66,6 +66,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .zoom-controls output{min-width:50px;text-align:center;font-size:12px;font-weight:700;color:#fff}
 #zoomReset{width:auto;min-width:44px;padding:0 5px;font-size:12px}
 .preview-wrap.white-flap-bg{background:#3a4049}
+.preview-wrap.space-pan,.preview-wrap.space-pan *{cursor:grab!important}
+.preview-wrap.space-panning,.preview-wrap.space-panning *{cursor:grabbing!important;user-select:none!important}
 .wide-tools-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .wide-tools-body.open{display:block}
 .subcard{background:#11151b;border:1px solid #303640;border-radius:9px;padding:10px;margin-top:9px}
@@ -899,7 +901,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div id="shareStatus" class="status"></div>
         </div>
         <div class="share-bar-right">
-          <span class="shortcut-hint">Pijltjes = verplaatsen · Shift+klik = meerdere selecteren · Ctrl/Cmd C/V/Z</span>
+          <span class="shortcut-hint">Pijltjes = verplaatsen · Spatie + slepen = door preview bewegen · Shift+klik = meerdere selecteren · Ctrl/Cmd C/V/Z</span>
         </div>
       </div>
       <details class="subdetails" style="margin-top:10px"><summary>Bewaarde ontwerpen op deze browser</summary><div class="subdetails-body">
@@ -988,6 +990,7 @@ let suppressClickAfterDrag=false;
 let multiSelection=[]; // array of {id,type}; primary selection remains state.selected/state.selectedType
 let internalClipboard=[];
 let previewZoom=1;
+let spacePanHeld=false,previewPan=null,suppressPanClick=false;
 
 function cloneState(){
   return JSON.parse(JSON.stringify(state));
@@ -1072,6 +1075,47 @@ $('previewWrap').addEventListener('wheel',event=>{
   event.preventDefault();
   setPreviewZoom(previewZoom*(event.deltaY<0?1.15:1/1.15),event.clientX,event.clientY);
 },{passive:false});
+const previewPanWrap=$('previewWrap');
+function stopPreviewPan(){
+  if(previewPan){
+    const pointerId=previewPan.id;
+    previewPan=null;
+    try{previewPanWrap.releasePointerCapture(pointerId);}catch(e){}
+    suppressPanClick=true;
+    requestAnimationFrame(()=>{suppressPanClick=false;});
+  }
+  previewPanWrap.classList.remove('space-panning');
+}
+function setSpacePanHeld(held){
+  spacePanHeld=held;
+  previewPanWrap.classList.toggle('space-pan',held);
+  if(!held)stopPreviewPan();
+}
+previewPanWrap.addEventListener('pointerdown',event=>{
+  if(!spacePanHeld||event.button!==0)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  previewPan={id:event.pointerId,x:event.clientX,y:event.clientY,left:previewPanWrap.scrollLeft,top:previewPanWrap.scrollTop};
+  previewPanWrap.setPointerCapture(event.pointerId);
+  previewPanWrap.classList.add('space-panning');
+},true);
+previewPanWrap.addEventListener('pointermove',event=>{
+  if(!previewPan||event.pointerId!==previewPan.id)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  previewPanWrap.scrollLeft=previewPan.left+previewPan.x-event.clientX;
+  previewPanWrap.scrollTop=previewPan.top+previewPan.y-event.clientY;
+},true);
+['pointerup','pointercancel','lostpointercapture'].forEach(type=>previewPanWrap.addEventListener(type,event=>{
+  if(!previewPan||event.pointerId!==previewPan.id)return;
+  event.preventDefault();event.stopImmediatePropagation();stopPreviewPan();
+},true));
+previewPanWrap.addEventListener('click',event=>{
+  if(!spacePanHeld&&!suppressPanClick)return;
+  event.preventDefault();event.stopImmediatePropagation();
+},true);
+document.addEventListener('keyup',event=>{
+  if(event.code==='Space'||event.key===' ')setSpacePanHeld(false);
+});
+window.addEventListener('blur',()=>setSpacePanHeld(false));
 function readBaseControls(){
   state.flap.w=Math.max(10,Number($('w').value)||190);
   state.flap.h=Math.max(5,Number($('h').value)||25);
@@ -1950,6 +1994,10 @@ document.addEventListener('keydown',e=>{
   const typing=tag==='input' || tag==='textarea' || tag==='select' || editable;
   const mod=e.ctrlKey || e.metaKey;
   const key=e.key.toLowerCase();
+
+  if(!typing&&!mod&&(e.code==='Space'||e.key===' ')){
+    e.preventDefault();setSpacePanHeld(true);return;
+  }
 
   if(!typing&&mod&&['+','=','add','-','_','subtract','0'].includes(key)){
     e.preventDefault();
