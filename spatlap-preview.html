@@ -1112,9 +1112,25 @@ previewPanWrap.addEventListener('click',event=>{
   if(!spacePanHeld&&!suppressPanClick)return;
   event.preventDefault();event.stopImmediatePropagation();
 },true);
-document.addEventListener('keyup',event=>{
-  if(event.code==='Space'||event.key===' ')setSpacePanHeld(false);
-});
+function isTypingForPan(target){
+  const tag=target?.tagName?.toLowerCase();
+  if(target?.isContentEditable||tag==='textarea'||tag==='select')return true;
+  if(tag!=='input')return false;
+  return !['range','checkbox','radio','color','file','button','submit','reset'].includes(target.type?.toLowerCase());
+}
+window.addEventListener('keydown',event=>{
+  if(event.code!=='Space'&&event.key!==' '&&event.key!=='Spacebar')return;
+  if(event.ctrlKey||event.metaKey||event.altKey||isTypingForPan(event.target))return;
+  if($('pdfViewer').classList.contains('open'))return;
+  event.preventDefault();
+  setSpacePanHeld(true);
+},true);
+window.addEventListener('keypress',event=>{
+  if(spacePanHeld&&(event.code==='Space'||event.key===' '||event.key==='Spacebar'))event.preventDefault();
+},true);
+window.addEventListener('keyup',event=>{
+  if(event.code==='Space'||event.key===' '||event.key==='Spacebar')setSpacePanHeld(false);
+},true);
 window.addEventListener('blur',()=>setSpacePanHeld(false));
 function readBaseControls(){
   state.flap.w=Math.max(10,Number($('w').value)||190);
@@ -1994,10 +2010,6 @@ document.addEventListener('keydown',e=>{
   const typing=tag==='input' || tag==='textarea' || tag==='select' || editable;
   const mod=e.ctrlKey || e.metaKey;
   const key=e.key.toLowerCase();
-
-  if(!typing&&!mod&&(e.code==='Space'||e.key===' ')){
-    e.preventDefault();setSpacePanHeld(true);return;
-  }
 
   if(!typing&&mod&&['+','=','add','-','_','subtract','0'].includes(key)){
     e.preventDefault();
