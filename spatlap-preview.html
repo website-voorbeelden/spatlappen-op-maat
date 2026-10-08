@@ -837,7 +837,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             </div>
             <div id="vectorPreviewStatus" class="field-help">Selecteer een afbeelding om het resultaat te bekijken.</div>
             <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Zichtbare PNG-pixels → witte vector</button></div>
-            <div class="field-help">Deze knop neemt iedere pixel mee die niet volledig transparant is en maakt die wit. Hij zet de transparantiegrens op 1. Ontstaat er randruis? Zet de grens iets hoger en gebruik de gewone vectorknop. De lichtgrens geldt alleen voor afbeeldingen zonder transparante achtergrond.</div>
+            <div class="field-help">Deze knop gebruikt de transparantie van de PNG als masker en maakt alleen het zichtbare logo wit. Een bijna onzichtbare achtergrond wordt automatisch weggelaten. Je kunt de transparantiegrens daarna zelf bijstellen.</div>
             <div class="row" style="margin-top:9px">
               <div><label>Max. kleuren in deze afbeelding</label><input id="vectorColorCount" type="number" min="1" max="8" value="1"></div>
               <div><label>Kleur bij 1 kleur</label><input id="vectorSingleColor" type="color" value="#ffffff"></div>
@@ -1501,6 +1501,28 @@ async function vectorizeRasterLogo(logo,count,singleColor,whiteCutout,edgeStyle,
   return {markup:new XMLSerializer().serializeToString(doc.documentElement),colors:count===1?[singleColor.toUpperCase()]:[...retainedColors],crop,sourceW:w,sourceH:h};
 }
 
+function pngMaskThreshold(rgba){
+  const histogram=new Uint32Array(256);
+  for(let i=3;i<rgba.length;i+=4)histogram[rgba[i]]++;
+  const total=rgba.length/4;
+  let transparent=0;
+  for(let a=0;a<255;a++)transparent+=histogram[a];
+  if(transparent<total*.005)return null;
+  let sum=0;
+  for(let a=0;a<256;a++)sum+=a*histogram[a];
+  let lowerCount=0,lowerSum=0,bestScore=-1,split=0;
+  for(let a=0;a<255;a++){
+    lowerCount+=histogram[a];lowerSum+=a*histogram[a];
+    if(!lowerCount||lowerCount===total)continue;
+    const upperCount=total-lowerCount;
+    const difference=lowerSum/lowerCount-(sum-lowerSum)/upperCount;
+    const score=lowerCount*upperCount*difference*difference;
+    if(score>bestScore){bestScore=score;split=a;}
+  }
+  // Alpha 1 often represents export noise, not printable artwork.
+  return Math.max(64,Math.min(255,split+1));
+}
+
 let vectorPreviewTimer,vectorPreviewToken=0,vectorPreviewLogoId=null,vectorPreviewSource=null,vectorPreviewSettings='';
 function scheduleVectorPreview(){
   $('vectorLightValue').textContent=$('vectorLightThreshold').value;
@@ -1558,15 +1580,14 @@ $('whitePngVector').onclick=async()=>{
     const context=canvas.getContext('2d',{willReadFrequently:true});
     context.drawImage(img,0,0,canvas.width,canvas.height);
     const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
-    let transparent=0;
-    for(let i=3;i<pixels.length;i+=4)if(pixels[i]===0)transparent++;
-    if(transparent<canvas.width*canvas.height*.005){
+    const maskThreshold=pngMaskThreshold(pixels);
+    if(maskThreshold===null){
       $('vectorStatus').textContent='Deze PNG heeft geen duidelijke transparante achtergrond. Gebruik de gewone vectorinstellingen om een achtergrond weg te laten.';
       return;
     }
     $('vectorColorCount').value='1';
     $('vectorSingleColor').value='#ffffff';
-    $('vectorAlphaThreshold').value='1';
+    $('vectorAlphaThreshold').value=String(maskThreshold);
     $('vectorWhiteCutout').checked=false;
     scheduleVectorPreview();
     await $('vectorizeLogo').onclick();
