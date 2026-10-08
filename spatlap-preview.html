@@ -64,6 +64,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .zoom-controls{position:absolute;top:10px;right:10px;z-index:20;display:flex;align-items:center;gap:4px;padding:4px;background:#171d26;border:1px solid #485667;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.25)}
 .zoom-controls button{width:32px;height:32px;padding:0;font-size:20px;line-height:1}
 .zoom-controls output{min-width:50px;text-align:center;font-size:12px;font-weight:700;color:#fff}
+#zoomReset{width:auto;min-width:44px;padding:0 5px;font-size:12px}
 .preview-wrap.white-flap-bg{background:#3a4049}
 .wide-tools-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .wide-tools-body.open{display:block}
@@ -813,8 +814,9 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
         </div>
         <div class="zoom-controls" aria-label="Voorvertoning inzoomen">
           <button id="zoomOut" type="button" aria-label="Uitzoomen" title="Uitzoomen (Ctrl/⌘ −)">−</button>
-          <output id="zoomLevel" title="Klik om passend te maken">100%</output>
+          <output id="zoomLevel">100%</output>
           <button id="zoomIn" type="button" aria-label="Inzoomen" title="Inzoomen (Ctrl/⌘ +)">+</button>
+          <button id="zoomReset" type="button" aria-label="Zoom herstellen naar 100 procent" title="Zoom herstellen (Ctrl/⌘ 0)">100%</button>
         </div>
       </div>
 
@@ -826,18 +828,11 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
       </div>
 
       <details class="subdetails" id="colorTools" open>
-        <summary>Kleuren & vector</summary>
+        <summary>Vector & kleuren</summary>
         <div class="subdetails-body">
           <div class="subcard">
-            <div class="subcard-title">Drukkleuren van de hele spatlap</div>
-            <div id="colorCountStatus" class="field-help">De spatlapkleur telt niet mee. Bij een onbekend logo kun je het aantal zelf invullen.</div>
-            <label class="check"><input id="showColorCount" type="checkbox"> Aantal drukkleuren tonen in de preview</label>
-            <label style="margin-top:9px">Aantal voor klant (leeg = automatisch)</label>
-            <input id="manualColorCount" type="number" min="1" max="99" placeholder="Automatisch">
-          </div>
-          <div class="subcard">
             <div class="subcard-title">Geselecteerde afbeelding naar vector omzetten</div>
-            <div id="vectorTarget" class="field-help">Selecteer een PNG, JPG of WebP in de preview. Deze omzetting geldt voor die afbeelding; de drukkleuren hierboven gelden voor het hele ontwerp.</div>
+            <div id="vectorTarget" class="field-help">Selecteer een PNG, JPG of WebP in de preview. Deze omzetting geldt voor die afbeelding; de drukkleuren hieronder gelden voor het hele ontwerp.</div>
             <div class="row" style="margin-top:9px">
               <div><label for="vectorLightThreshold">Lichtgrens <output id="vectorLightValue">170</output></label><input id="vectorLightThreshold" type="range" min="0" max="255" value="170"></div>
               <div><label for="vectorAlphaThreshold">Transparantiegrens <output id="vectorAlphaValue">64</output></label><input id="vectorAlphaThreshold" type="range" min="1" max="255" value="64"></div>
@@ -864,6 +859,13 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <div class="field-help">Bij een transparante PNG gebruikt de tool de transparantie. Bij een afbeelding zonder transparantie kun je hiermee de donkere achtergrond weglaten, ook bij meer kleuren.</div>
             <div class="mini-actions" style="margin-top:9px"><button id="vectorizeLogo" type="button">Zet afbeelding om naar vector</button><button id="restoreRasterLogo" type="button" disabled>Origineel herstellen</button></div>
             <div id="vectorStatus" class="field-help">Voor een wit logo kies je 1 kleur. Controleer het resultaat in de preview.</div>
+          </div>
+          <div class="subcard">
+            <div class="subcard-title">Drukkleuren van de hele spatlap</div>
+            <div id="colorCountStatus" class="field-help">De spatlapkleur telt niet mee. Bij een onbekend logo kun je het aantal zelf invullen.</div>
+            <label class="check"><input id="showColorCount" type="checkbox"> Aantal drukkleuren tonen in de preview</label>
+            <label style="margin-top:9px">Aantal voor klant (leeg = automatisch)</label>
+            <input id="manualColorCount" type="number" min="1" max="99" placeholder="Automatisch">
           </div>
           <div class="subcard">
             <div class="subcard-title">Klantpreview</div>
@@ -1021,8 +1023,8 @@ function scaleFactor(){
   const w=Math.max(10,state.flap.w),h=Math.max(5,state.flap.h);
   const wrap=$('previewWrap');
   const phone=window.matchMedia('(max-width:700px)').matches;
-  const availableW=wrap ? Math.max(phone?120:180,wrap.clientWidth-(phone?90:150)) : Math.max(180,window.innerWidth-500);
-  const availableH=wrap ? Math.max(phone?40:180,wrap.clientHeight-(phone?70:150)) : 360;
+  const availableW=wrap ? Math.max(phone?120:180,wrap.offsetWidth-(phone?90:150)) : Math.max(180,window.innerWidth-500);
+  const availableH=wrap ? Math.max(phone?40:180,wrap.offsetHeight-(phone?70:150)) : 360;
   const maxW=Math.min(980,availableW);
   const maxH=Math.min(360,availableH);
   return Math.max(.1,Math.min(maxW/w,maxH/h))*previewZoom;
@@ -1044,7 +1046,7 @@ function setPreviewZoom(value,clientX,clientY){
 }
 $('zoomIn').onclick=()=>setPreviewZoom(previewZoom*1.25);
 $('zoomOut').onclick=()=>setPreviewZoom(previewZoom/1.25);
-$('zoomLevel').onclick=()=>setPreviewZoom(1);
+$('zoomReset').onclick=()=>setPreviewZoom(1);
 $('previewWrap').addEventListener('wheel',event=>{
   if(!event.ctrlKey&&!event.metaKey)return;
   event.preventDefault();
@@ -1172,8 +1174,8 @@ function syncSelectionControls(){
   $('whitePngVector').disabled=!canTrace||!/\.png$/i.test(logo.name||'');
   $('restoreRasterLogo').disabled=!logo?.originalRasterSrc;
   $('vectorTarget').textContent=logo
-    ? canTrace?`Geselecteerd: ${logo.name||'afbeelding'}. Alleen deze afbeelding wordt omgezet; het kleurenaantal van het hele ontwerp staat hierboven.`:`Geselecteerd: ${logo.name||'SVG'}. Dit is al een vectorbestand. Kies een PNG/JPG/WebP om kleuren te beperken.`
-    :'Selecteer een PNG, JPG, WebP of geïmporteerde PDF-pagina in de preview. De omzetting geldt voor die afbeelding; het kleurenaantal hierboven voor het hele ontwerp.';
+    ? canTrace?`Geselecteerd: ${logo.name||'afbeelding'}. Alleen deze afbeelding wordt omgezet; het kleurenaantal van het hele ontwerp staat hieronder.`:`Geselecteerd: ${logo.name||'SVG'}. Dit is al een vectorbestand. Kies een PNG/JPG/WebP om kleuren te beperken.`
+    :'Selecteer een PNG, JPG, WebP of geïmporteerde PDF-pagina in de preview. De omzetting geldt voor die afbeelding; het kleurenaantal hieronder voor het hele ontwerp.';
   if(logo){
     $('selectedLogoVectorCheck').checked=!!logo.svgMarkup;
     $('selectedLogoVectorLabel').textContent=logo.svgMarkup?'Vectorbestand ✓':'Nog geen vectorbestand';
@@ -2371,30 +2373,27 @@ function shoulderRoundedPath(ctx,w,h,inset,topH,r){
 
 async function exportPNG(){
   if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
-  // Screenshot-style export of the live preview area.
+  // Draw the preview at its fitted size; screen zoom and scroll never affect downloads.
   const wrap=$('previewWrap');
   const flap=$('flap');
   if(!wrap || !flap)return;
 
-  const wrapRect=wrap.getBoundingClientRect();
-  const flapRect=flap.getBoundingClientRect();
-  const scale=Math.max(2,Math.min(4,1200/Math.max(1,wrapRect.width)));
+  const wrapW=wrap.offsetWidth,wrapH=wrap.offsetHeight;
+  const fittedScale=scaleFactor()/previewZoom;
+  const fw=state.flap.w*fittedScale,fh=state.flap.h*fittedScale;
+  const ox=(wrapW-fw)/2,oy=(wrapH-fh)/2;
+  const scale=Math.max(2,Math.min(4,1200/Math.max(1,wrapW)));
 
   const c=document.createElement('canvas');
-  c.width=Math.max(1,Math.round(wrapRect.width*scale));
-  c.height=Math.max(1,Math.round(wrapRect.height*scale));
+  c.width=Math.max(1,Math.round(wrapW*scale));
+  c.height=Math.max(1,Math.round(wrapH*scale));
   const ctx=c.getContext('2d');
   ctx.scale(scale,scale);
 
   const wrapStyle=getComputedStyle(wrap);
   const workspaceBg=wrapStyle.backgroundColor || '#e9edf2';
   ctx.fillStyle=workspaceBg;
-  ctx.fillRect(0,0,wrapRect.width,wrapRect.height);
-
-  const ox=flapRect.left-wrapRect.left;
-  const oy=flapRect.top-wrapRect.top;
-  const fw=flapRect.width;
-  const fh=flapRect.height;
+  ctx.fillRect(0,0,wrapW,wrapH);
   const pxPerCmX=fw/state.flap.w;
   const pxPerCmY=fh/state.flap.h;
   const rPx=(state.flap.radius||0)*pxPerCmY;
@@ -2515,51 +2514,25 @@ async function exportPNG(){
 
   ctx.restore();
 
-  // Dimension labels at their live positions.
-  const dimTop=$('dimTop');
-  if(dimTop){
-    const r=dimTop.getBoundingClientRect();
-    const st=getComputedStyle(dimTop);
-    ctx.font=`700 ${parseFloat(st.fontSize)||13}px Arial`;
-    ctx.fillStyle=st.color||'#222';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(dimTop.textContent,r.left-wrapRect.left+r.width/2,r.top-wrapRect.top+r.height/2);
-  }
+  ctx.font='700 13px Arial';
+  ctx.fillStyle=state.flap.color.toLowerCase()==='#f3f3f3'?'#f4f7fb':'#222';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(`${state.flap.w} cm`,ox+fw/2,oy-26);
+  ctx.save();ctx.translate(ox-35,oy+fh/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText(`${state.flap.h} cm`,0,0);ctx.restore();
 
-  const dimLeft=$('dimLeft');
-  if(dimLeft){
-    const r=dimLeft.getBoundingClientRect();
-    const st=getComputedStyle(dimLeft);
-    ctx.save();
-    ctx.translate(r.left-wrapRect.left+r.width/2,r.top-wrapRect.top+r.height/2);
-    ctx.rotate(-Math.PI/2);
-    ctx.font=`700 ${parseFloat(st.fontSize)||13}px Arial`;
-    ctx.fillStyle=st.color||'#222';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(dimLeft.textContent,0,0);
-    ctx.restore();
-  }
-
-  // Preview badges at their live positions.
-  for(const badge of [$('colorBadge'),$('qtyBadge')]){
-    if(!badge || getComputedStyle(badge).display==='none')continue;
-    const r=badge.getBoundingClientRect();
-    const st=getComputedStyle(badge);
-    const x=r.left-wrapRect.left, y=r.top-wrapRect.top;
-
-    ctx.fillStyle=st.backgroundColor||'#fff';
-    ctx.strokeStyle=st.borderColor||'#cbd2da';
-    ctx.lineWidth=1;
-    roundRectPath(ctx,x,y,r.width,r.height,8,8,8,8);
+  const badges=[];
+  if(state.ui?.showColorCount)badges.push(colorCountInfo().label);
+  if(String(state.flap.qty).trim())badges.push(`Aantal: ${state.flap.qty}`);
+  let badgeX=ox;
+  for(const label of badges){
+    ctx.font='700 12px Arial';
+    const badgeW=ctx.measureText(label).width+20,badgeH=28,badgeY=oy+fh+10;
+    ctx.fillStyle='#fff';ctx.strokeStyle='#cbd2da';ctx.lineWidth=1;
+    roundRectPath(ctx,badgeX,badgeY,badgeW,badgeH,8,8,8,8);
     ctx.fill();ctx.stroke();
-
-    ctx.fillStyle=st.color||'#222';
-    ctx.font=`700 ${parseFloat(st.fontSize)||12}px Arial`;
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(badge.textContent,x+r.width/2,y+r.height/2);
+    ctx.fillStyle='#222';ctx.fillText(label,badgeX+badgeW/2,badgeY+badgeH/2);
+    badgeX+=badgeW+8;
   }
 
   const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
