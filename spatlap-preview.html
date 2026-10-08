@@ -848,7 +848,7 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
       </div>
 
       <details class="subdetails" id="colorTools" open>
-        <summary>Vector & kleuren</summary>
+        <summary>Vector & klantpreview</summary>
         <div class="subdetails-body">
           <div class="subcard">
             <div class="subcard-title">Geselecteerde afbeelding naar vector omzetten</div>
@@ -881,13 +881,6 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <div id="vectorStatus" class="field-help">Voor een wit logo kies je 1 kleur. Controleer het resultaat in de preview.</div>
           </div>
           <div class="subcard">
-            <div class="subcard-title">Drukkleuren van de hele spatlap</div>
-            <div id="colorCountStatus" class="field-help">De spatlapkleur telt niet mee. Bij een onbekend logo kun je het aantal zelf invullen.</div>
-            <label class="check"><input id="showColorCount" type="checkbox"> Aantal drukkleuren tonen in de preview</label>
-            <label style="margin-top:9px">Aantal voor klant (leeg = automatisch)</label>
-            <input id="manualColorCount" type="number" min="1" max="99" placeholder="Automatisch">
-          </div>
-          <div class="subcard">
             <div class="subcard-title">Klantpreview</div>
             <label class="check"><input id="topGuideOn" type="checkbox"> Bovenstrook van 3 cm tonen</label>
             <div class="field-help">Visuele hulplijn vanaf de bovenrand. De strook verandert het drukbestand niet.</div>
@@ -913,6 +906,13 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
         <div class="field-help">Een korte lokale link werkt alleen in deze browser en bij ditzelfde bestand. Klik na wijzigingen opnieuw op bewaren. Browsergegevens wissen verwijdert deze ontwerpen. Gebruik de deelbare link voor een klant of ander apparaat. Bewaar lokaal als je de vectoromzetting later opnieuw wilt afstellen.</div>
         <div id="savedDesigns" class="list" style="margin-top:10px"></div>
       </div></details>
+      <div class="subcard" style="margin-top:14px">
+        <div class="subcard-title">Drukkleuren van de hele spatlap</div>
+        <div id="colorCountStatus" class="field-help">De spatlapkleur telt niet mee. Bij een onbekend logo kun je het aantal zelf invullen.</div>
+        <label class="check"><input id="showColorCount" type="checkbox"> Aantal drukkleuren tonen in de preview</label>
+        <label style="margin-top:9px">Aantal voor klant (leeg = automatisch)</label>
+        <input id="manualColorCount" type="number" min="1" max="99" placeholder="Automatisch">
+      </div>
     </div>
   </main>
 </div>
