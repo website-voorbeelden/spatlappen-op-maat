@@ -2481,12 +2481,12 @@ function drawDesignText(ctx,t,centerX,y,pxPerCm){
   chars.forEach((char,i)=>{ctx.fillText(char,x,y);x+=widths[i]+spacing;});
 }
 
-async function exportPNG(){
+async function createPreviewPngBlob(){
   if(document.fonts?.ready){try{await document.fonts.ready;}catch(e){}}
   // Draw the preview at its fitted size; screen zoom and scroll never affect downloads.
   const wrap=$('previewWrap');
   const flap=$('flap');
-  if(!wrap || !flap)return;
+  if(!wrap || !flap)throw new Error('Voorvertoning niet beschikbaar');
 
   const wrapW=wrap.offsetWidth,wrapH=wrap.offsetHeight;
   const fittedScale=scaleFactor()/previewZoom;
@@ -2633,6 +2633,12 @@ async function exportPNG(){
   }
 
   const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
+  if(!blob)throw new Error('PNG-preview maken mislukt');
+  return blob;
+}
+
+async function exportPNG(){
+  const blob=await createPreviewPngBlob();
 
   // Download always.
   if(blob){
@@ -3069,10 +3075,65 @@ function showLocalLink(id,message){
   status.append(link);
 }
 function compactDesignState(){return {f:state.flap,h:state.holes,l:state.logos,t:state.texts,u:state.ui};}
+const designFormat='spatlap-preview-design';
+const designFormatVersion=1;
+let integrationContext={customerId:null,orderId:null,designId:null};
+let centralStorageAdapter=null;
+function normalizeIntegrationContext(value={}){
+  const result={};
+  for(const key of ['customerId','orderId','designId']){
+    const id=value?.[key];
+    result[key]=id==null||id===''?null:String(id);
+  }
+  return result;
+}
+function assertDurableLogoSources(logos){
+  for(const logo of logos){
+    for(const key of ['src','originalRasterSrc']){
+      if(/^(blob:|file:)/i.test(logo?.[key]||'')){
+        throw new Error(`Logo ${logo.name||''} gebruikt een tijdelijk bestand. Importeer het logo opnieuw voordat je centraal opslaat.`);
+      }
+    }
+  }
+}
+function exportDesignDocument(){
+  const snapshot=JSON.parse(JSON.stringify(compactDesignState()));
+  assertDurableLogoSources(snapshot.l);
+  return {
+    format:designFormat,
+    version:designFormatVersion,
+    context:{...integrationContext},
+    design:{flap:snapshot.f,holes:snapshot.h,logos:snapshot.l,texts:snapshot.t,ui:snapshot.u}
+  };
+}
+function importDesignDocument(documentData){
+  if(documentData?.format!==designFormat||documentData.version!==designFormatVersion){
+    throw new Error('Onbekende versie van het ontwerpformaat');
+  }
+  const design=documentData.design;
+  if(!design?.flap||!design.holes||!Array.isArray(design.logos)||!Array.isArray(design.texts)){
+    throw new Error('Het opgeslagen ontwerp is onvolledig');
+  }
+  const snapshot=JSON.parse(JSON.stringify(design));
+  assertDurableLogoSources(snapshot.logos);
+  if(!applyCompactState({f:snapshot.flap,h:snapshot.holes,l:snapshot.logos,t:snapshot.texts,u:snapshot.ui})){
+    throw new Error('Het opgeslagen ontwerp kon niet worden geladen');
+  }
+  integrationContext=normalizeIntegrationContext(documentData.context);
+  currentLocalDesignId=null;
+  $('localDesignName').value='';
+  return true;
+}
+function setCentralStorageAdapter(adapter){
+  if(!adapter||typeof adapter.save!=='function'||typeof adapter.load!=='function'){
+    throw new TypeError('Opslagadapter moet save en load functies hebben');
+  }
+  centralStorageAdapter=adapter;
+}
 async function saveCurrentLocally(){
   const id=currentLocalDesignId||(crypto.randomUUID?.()||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)));
   const name=$('localDesignName').value.trim()||`Ontwerp ${new Date().toLocaleString('nl-NL')}`;
-  const record={id,name,updatedAt:Date.now(),payload:JSON.parse(JSON.stringify(compactDesignState()))};
+  const record={id,name,updatedAt:Date.now(),payload:JSON.parse(JSON.stringify(compactDesignState())),context:{...integrationContext}};
   await writeLocalDesign(record);
   currentLocalDesignId=id;
   $('localDesignName').value=name;
@@ -3098,6 +3159,7 @@ async function openSavedDesign(id){
     $('shareStatus').textContent='Dit ontwerp is niet meer aanwezig in deze browser.';return false;
   }
   currentLocalDesignId=id;
+  integrationContext=normalizeIntegrationContext(record.context);
   $('localDesignName').value=record.name||'';
   location.hash='local='+encodeURIComponent(id);
   $('shareStatus').textContent='Lokaal ontwerp geopend.';
@@ -3289,7 +3351,29 @@ async function initDesign(){
   await renderSavedDesigns();
   updateHistoryButtons();
 }
-initDesign();
+const previewReady=initDesign();
+window.SpatlapPreview=Object.freeze({
+  ready:previewReady,
+  format:designFormat,
+  formatVersion:designFormatVersion,
+  exportDesign:exportDesignDocument,
+  importDesign:async documentData=>{await previewReady;return importDesignDocument(documentData);},
+  setContext:value=>{integrationContext=normalizeIntegrationContext(value);},
+  getContext:()=>({...integrationContext}),
+  createPreviewPngBlob:async()=>{await previewReady;return createPreviewPngBlob();},
+  setStorageAdapter:setCentralStorageAdapter,
+  saveToStorage:async()=>{
+    await previewReady;
+    if(!centralStorageAdapter)throw new Error('Er is nog geen centrale opslag gekoppeld');
+    return centralStorageAdapter.save(exportDesignDocument(),await createPreviewPngBlob());
+  },
+  loadFromStorage:async designId=>{
+    await previewReady;
+    if(!centralStorageAdapter)throw new Error('Er is nog geen centrale opslag gekoppeld');
+    const documentData=await centralStorageAdapter.load(designId,{...integrationContext});
+    return importDesignDocument(documentData);
+  }
+});
 </script>
 
 </body>
