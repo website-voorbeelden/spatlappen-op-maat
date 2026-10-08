@@ -826,6 +826,8 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
           <div class="subcard">
             <div class="subcard-title">Geselecteerde afbeelding naar vector omzetten</div>
             <div id="vectorTarget" class="field-help">Selecteer een PNG, JPG of WebP in de preview. Deze omzetting geldt voor die afbeelding; de drukkleuren hierboven gelden voor het hele ontwerp.</div>
+            <div class="mini-actions" style="margin-top:10px"><button id="whitePngVector" class="primary" type="button" disabled>⚡ Transparante PNG → witte vector</button></div>
+            <div class="field-help">Selecteer een transparante PNG en klik op deze knop. De zichtbare pixels worden wit; de transparante achtergrond blijft weg.</div>
             <div class="row" style="margin-top:9px">
               <div><label for="vectorLightThreshold">Lichtgrens <output id="vectorLightValue">170</output></label><input id="vectorLightThreshold" type="range" min="0" max="255" value="170"></div>
               <div><label for="vectorAlphaThreshold">Transparantiegrens <output id="vectorAlphaValue">64</output></label><input id="vectorAlphaThreshold" type="range" min="1" max="255" value="64"></div>
@@ -1131,6 +1133,7 @@ function syncSelectionControls(){
   $('logoControls').style.display=logo?'block':'none';
   const canTrace=!!logo&&(!logo.svgMarkup||!!logo.originalRasterSrc);
   $('vectorizeLogo').disabled=!canTrace;
+  $('whitePngVector').disabled=!canTrace||!/\.png$/i.test(logo.name||'');
   $('restoreRasterLogo').disabled=!logo?.originalRasterSrc;
   $('vectorTarget').textContent=logo
     ? canTrace?`Geselecteerd: ${logo.name||'afbeelding'}. Alleen deze afbeelding wordt omgezet; het kleurenaantal van het hele ontwerp staat hierboven.`:`Geselecteerd: ${logo.name||'SVG'}. Dit is al een vectorbestand. Kies een PNG/JPG/WebP om kleuren te beperken.`
@@ -1541,6 +1544,35 @@ function scheduleVectorPreview(){
   $(id).addEventListener('input',scheduleVectorPreview);
   $(id).addEventListener('change',scheduleVectorPreview);
 });
+
+$('whitePngVector').onclick=async()=>{
+  const logo=state.selectedType==='logo'?itemById(state.selected,'logo'):null;
+  if(!logo||!/\.png$/i.test(logo.name||''))return;
+  const btn=$('whitePngVector');btn.disabled=true;
+  try{
+    const img=new Image();img.src=logo.originalRasterSrc||logo.src;await img.decode();
+    const scale=Math.min(1,400/Math.max(img.naturalWidth,img.naturalHeight));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const context=canvas.getContext('2d',{willReadFrequently:true});
+    context.drawImage(img,0,0,canvas.width,canvas.height);
+    const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
+    let transparent=0;
+    for(let i=3;i<pixels.length;i+=4)if(pixels[i]<64)transparent++;
+    if(transparent<canvas.width*canvas.height*.005){
+      $('vectorStatus').textContent='Deze PNG heeft geen duidelijke transparante achtergrond. Gebruik de gewone vectorinstellingen om een achtergrond weg te laten.';
+      return;
+    }
+    $('vectorColorCount').value='1';
+    $('vectorSingleColor').value='#ffffff';
+    $('vectorAlphaThreshold').value='64';
+    $('vectorWhiteCutout').checked=false;
+    scheduleVectorPreview();
+    await $('vectorizeLogo').onclick();
+  }catch(err){$('vectorStatus').textContent=`PNG openen lukte niet: ${err.message||'probeer opnieuw'}`;}
+  finally{btn.disabled=false;}
+};
 
 $('vectorizeLogo').onclick=async()=>{
   const logo=itemById(state.selected,'logo');
