@@ -6,7 +6,7 @@
 <title>Spatlap Preview Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Oswald:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Russo+One&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Grenze+Gotisch:wght@400;700&family=New+Rocker&family=Oswald:wght@400;600;700&family=Pirata+One&family=Rajdhani:wght@500;600;700&family=Russo+One&family=Teko:wght@500;600;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -655,6 +655,12 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <option value="'Black Ops One', Impact, sans-serif">Black Ops One</option>
               <option value="Rajdhani, 'Arial Narrow', sans-serif">Rajdhani</option>
             </optgroup>
+            <optgroup label="Gothic / Tattoo">
+              <option value="'Pirata One', Georgia, serif">Pirata One</option>
+              <option value="'UnifrakturMaguntia', Georgia, serif">UnifrakturMaguntia</option>
+              <option value="'Grenze Gotisch', Georgia, serif">Grenze Gotisch</option>
+              <option value="'New Rocker', Georgia, serif">New Rocker</option>
+            </optgroup>
             <option value="'Arial Narrow', Arial, sans-serif">Arial Narrow</option>
             <option value="'Franklin Gothic Medium', Arial, sans-serif">Franklin Gothic</option>
             <option value="Rockwell, 'Rockwell Extra Bold', serif">Rockwell</option>
@@ -671,7 +677,11 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <option value="'Courier New', monospace">Courier New</option>
           </select>
           <div id="textFontPreview" class="font-preview">Voorbeeld</div>
-          <div class="field-help">Het eerste woord wordt hierboven direct in het gekozen lettertype getoond. De Truck / Motorsport-fonts laden online en vallen anders terug op een vergelijkbaar systeemfont.</div>
+          <div class="field-help">Het eerste woord wordt hierboven direct in het gekozen lettertype getoond. Online lettertypes vallen zonder internet terug op een systeemfont.</div>
+        </div>
+        <div class="row">
+          <div><label for="textTracking">Letterafstand / tracking (cm)</label><input id="textTracking" type="number" value="0" min="-0.5" max="2" step="0.05"></div>
+          <div><label for="textWeight">Dikte</label><select id="textWeight"><option value="700">Vet</option><option value="400">Normaal</option></select></div>
         </div>
         <button id="addText" style="width:100%">+ Tekst toevoegen</button>
 
@@ -716,6 +726,12 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
               <option value="'Black Ops One', Impact, sans-serif">Black Ops One</option>
               <option value="Rajdhani, 'Arial Narrow', sans-serif">Rajdhani</option>
             </optgroup>
+            <optgroup label="Gothic / Tattoo">
+              <option value="'Pirata One', Georgia, serif">Pirata One</option>
+              <option value="'UnifrakturMaguntia', Georgia, serif">UnifrakturMaguntia</option>
+              <option value="'Grenze Gotisch', Georgia, serif">Grenze Gotisch</option>
+              <option value="'New Rocker', Georgia, serif">New Rocker</option>
+            </optgroup>
             <option value="'Arial Narrow', Arial, sans-serif">Arial Narrow</option>
             <option value="'Franklin Gothic Medium', Arial, sans-serif">Franklin Gothic</option>
             <option value="Rockwell, 'Rockwell Extra Bold', serif">Rockwell</option>
@@ -732,6 +748,10 @@ details.section[open] > summary{border-bottom:1px solid var(--line)}
             <option value="'Courier New', monospace">Courier New</option>
               </select>
               <div id="editTextFontPreview" class="font-preview">Voorbeeld</div>
+            </div>
+            <div class="row">
+              <div><label for="editTextTracking">Letterafstand / tracking (cm)</label><input id="editTextTracking" type="number" min="-0.5" max="2" step="0.05"></div>
+              <div><label for="editTextWeight">Dikte</label><select id="editTextWeight"><option value="700">Vet</option><option value="400">Normaal</option></select></div>
             </div>
             <div class="mini-actions">
               <button id="centerText">Centreren</button>
@@ -1194,6 +1214,8 @@ function syncSelectionControls(){
   if(txt){
     if(!txt.font)txt.font='Arial, sans-serif';
     $('editText').value=txt.text;$('editTextSize').value=txt.size;
+    $('editTextTracking').value=txt.tracking??0;
+    $('editTextWeight').value=String(txt.weight||700);
     $('editTextColor').value=normalizeHex(txt.color);
     $('editTextColorHex').value=normalizeHex(txt.color).toUpperCase();
     $('editTextAlign').value=txt.align||'center';
@@ -1787,17 +1809,23 @@ function firstWord(value){
   const v=String(value||'').trim();
   return v ? v.split(/\s+/)[0] : 'Voorbeeld';
 }
+function textTracking(value){return Math.max(-.5,Math.min(2,Number(value)||0));}
+function textWeight(value){return Number(value)===400?400:700;}
 function updateFontPreviews(){
   const apply=()=>{
     const p=$('textFontPreview');
     if(p){
       p.textContent=firstWord($('textValue')?.value);
       p.style.fontFamily=$('textFont')?.value||'Arial, sans-serif';
+      p.style.fontWeight=String(textWeight($('textWeight').value));
+      p.style.letterSpacing=(textTracking($('textTracking').value)*26/Math.max(.5,Number($('textSize').value)||5))+'px';
     }
     const ep=$('editTextFontPreview');
     if(ep){
       ep.textContent=firstWord($('editText')?.value);
       ep.style.fontFamily=$('editTextFont')?.value||'Arial, sans-serif';
+      ep.style.fontWeight=String(textWeight($('editTextWeight').value));
+      ep.style.letterSpacing=(textTracking($('editTextTracking').value)*26/Math.max(.5,Number($('editTextSize').value)||5))+'px';
     }
   };
   if(document.fonts?.ready){
@@ -1810,20 +1838,22 @@ $('textValue').addEventListener('input',updateFontPreviews);
 $('textFont').addEventListener('change',updateFontPreviews);
 $('editText').addEventListener('input',updateFontPreviews);
 $('editTextFont').addEventListener('change',updateFontPreviews);
+['textTracking','textWeight','textSize','editTextTracking','editTextWeight','editTextSize'].forEach(id=>$(id).addEventListener('input',updateFontPreviews));
 updateFontPreviews();
 
 $('addText').onclick=()=>{
   const v=$('textValue').value.trim();if(!v)return;pushHistory();
   const size=Math.max(.5,Number($('textSize').value)||5);
-  const obj={id:'t'+Date.now()+Math.random(),text:v,size,color:normalizeHex($('textColorHex').value),font:$('textFont').value||'Arial, sans-serif',x:.5,y:verticalPlacement(size,'middle'),align:'center'};
+  const obj={id:'t'+Date.now()+Math.random(),text:v,size,color:normalizeHex($('textColorHex').value),font:$('textFont').value||'Arial, sans-serif',tracking:textTracking($('textTracking').value),weight:textWeight($('textWeight').value),x:.5,y:verticalPlacement(size,'middle'),align:'center'};
   state.texts.push(obj);state.selected=obj.id;state.selectedType='text';$('textValue').value='';
   syncSelectionControls();render();
 };
-['editText','editTextSize','editTextAlign','editTextFont'].forEach(id=>{
+['editText','editTextSize','editTextAlign','editTextFont','editTextTracking','editTextWeight'].forEach(id=>{
   $(id).addEventListener('change',()=>{
     const t=itemById(state.selected,'text');if(!t)return;pushHistory();
     t.text=$('editText').value;t.size=Math.max(.5,Number($('editTextSize').value)||1);
-    t.color=normalizeHex($('editTextColorHex').value);t.align=$('editTextAlign').value;t.font=$('editTextFont').value||'Arial, sans-serif';render();
+    t.color=normalizeHex($('editTextColorHex').value);t.align=$('editTextAlign').value;t.font=$('editTextFont').value||'Arial, sans-serif';
+    t.tracking=textTracking($('editTextTracking').value);t.weight=textWeight($('editTextWeight').value);render();
   });
 });
 $('centerText').onclick=()=>{const t=itemById(state.selected,'text');if(!t)return;pushHistory();t.x=.5;t.y=verticalPlacement(t.size,'middle');syncSelectionControls();render();};
@@ -2268,6 +2298,9 @@ function render(){
     d.className='item text-item'+(state.selected===t.id&&state.selectedType==='text'?' selected':'')+(multiSelection.some(r=>r.id===t.id&&r.type==='text')?' multi-selected':'');
     d.style.left=(t.x*100)+'%';d.style.top=(t.y*100)+'%';d.style.fontSize=(t.size*s)+'px';d.style.color=t.color;
     d.style.fontFamily=t.font||'Arial, sans-serif';
+    d.style.fontWeight=String(textWeight(t.weight));
+    d.style.letterSpacing=(textTracking(t.tracking)*s)+'px';
+    d.style.fontKerning=textTracking(t.tracking)?'none':'auto';
     d.style.textAlign=t.align||'center';
     bindDrag(d,t,'text');d.onclick=e=>{e.stopPropagation();if(!suppressClickAfterDrag)setSelected(t.id,'text',e.shiftKey)};flap.appendChild(d);
   });
@@ -2369,6 +2402,23 @@ function shoulderRoundedPath(ctx,w,h,inset,topH,r){
   ctx.lineTo(xL,r);
   ctx.quadraticCurveTo(xL,0,xL+r,0);
   ctx.closePath();
+}
+
+function drawDesignText(ctx,t,centerX,y,pxPerCm){
+  const value=String(t.text||'');
+  ctx.font=`${textWeight(t.weight)} ${t.size*pxPerCm}px ${t.font||'Arial, sans-serif'}`;
+  ctx.fillStyle=t.color;
+  ctx.textBaseline='middle';
+  const spacing=textTracking(t.tracking)*pxPerCm;
+  if(!spacing){ctx.textAlign='center';ctx.fillText(value,centerX,y);return;}
+  const chars=typeof Intl.Segmenter==='function'
+    ? [...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(value)].map(part=>part.segment)
+    : Array.from(value);
+  const widths=chars.map(char=>ctx.measureText(char).width);
+  const total=widths.reduce((sum,width)=>sum+width,0)+spacing*Math.max(0,chars.length-1);
+  let x=centerX-total/2;
+  ctx.textAlign='left';
+  chars.forEach((char,i)=>{ctx.fillText(char,x,y);x+=widths[i]+spacing;});
 }
 
 async function exportPNG(){
@@ -2490,20 +2540,7 @@ async function exportPNG(){
   }
 
   // Text.
-  state.texts.forEach(t=>{
-    const fs=t.size*pxPerCmY;
-    ctx.font=`700 ${fs}px ${t.font||'Arial, sans-serif'}`;
-    ctx.fillStyle=t.color;
-    ctx.textBaseline='middle';
-    ctx.textAlign=t.align||'center';
-
-    let tx=ox+t.x*fw;
-    const ty=oy+t.y*fh;
-    const mw=ctx.measureText(t.text).width;
-    if(t.align==='left')tx-=mw/2;
-    if(t.align==='right')tx+=mw/2;
-    ctx.fillText(t.text,tx,ty);
-  });
+  state.texts.forEach(t=>drawDesignText(ctx,t,ox+t.x*fw,oy+t.y*fh,pxPerCmY));
 
   if(state.ui?.topGuideOn){
     const guideH=Math.min(3,state.flap.h)*pxPerCmY;
@@ -2587,17 +2624,7 @@ async function buildArtworkCanvas(scale=14,background=null){
     });
   }
 
-  state.texts.forEach(t=>{
-    const fs=t.size*scale;
-    ctx.font=`700 ${fs}px ${t.font||'Arial, sans-serif'}`;
-    ctx.fillStyle=t.color;
-    ctx.textBaseline='middle';
-    ctx.textAlign=t.align||'center';
-    let tx=t.x*W;
-    if(t.align==='left') tx-=ctx.measureText(t.text).width/2;
-    if(t.align==='right') tx+=ctx.measureText(t.text).width/2;
-    ctx.fillText(t.text,tx,t.y*H);
-  });
+  state.texts.forEach(t=>drawDesignText(ctx,t,t.x*W,t.y*H,scale));
   return c;
 }
 
@@ -2657,7 +2684,7 @@ function artworkSvgMarkup(){
 
   state.texts.forEach(t=>{
     const anchor=t.align==='left'?'start':t.align==='right'?'end':'middle';
-    parts.push(`<text x="${t.x*w}" y="${t.y*h}" fill="${escapeXml(t.color)}" font-family="${escapeXml(t.font||'Arial, sans-serif')}" font-size="${t.size}" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">${escapeXml(t.text)}</text>`);
+    parts.push(`<text x="${t.x*w}" y="${t.y*h}" fill="${escapeXml(t.color)}" font-family="${escapeXml(t.font||'Arial, sans-serif')}" font-size="${t.size}" font-weight="${textWeight(t.weight)}" letter-spacing="${textTracking(t.tracking)}" text-anchor="${anchor}" dominant-baseline="middle">${escapeXml(t.text)}</text>`);
   });
 
   parts.push('</svg>');
@@ -2879,6 +2906,8 @@ De tool accepteert deze queryparameters:
 - textSize = teksthoogte in cm als die bekend of duidelijk gewenst is
 - textColor = hexcode zoals %23FFFFFF
 - textFont = bijvoorbeeld Arial%2C%20sans-serif of Impact%2C%20sans-serif
+- textTracking = letterafstand in cm, van -0.5 tot 2
+- textWeight = 400 (normaal) of 700 (vet)
 - textX = horizontale positie van de tekst als fractie 0 t/m 1
 - textY = verticale positie van de tekst als fractie 0 t/m 1
 
@@ -3122,6 +3151,8 @@ function loadFromQuery(){
       size:Math.max(.5,n('textSize',5)),
       color:normalizeHex(s('textColor','#FFFFFF')),
       font:s('textFont','Arial, sans-serif'),
+      tracking:textTracking(n('textTracking',0)),
+      weight:textWeight(n('textWeight',700)),
       x:Math.max(0,Math.min(1,n('textX',.5))),
       y:Math.max(0,Math.min(1,n('textY',.55))),
       align:'center'
